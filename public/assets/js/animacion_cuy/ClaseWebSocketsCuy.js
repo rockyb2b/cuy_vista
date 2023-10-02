@@ -302,7 +302,7 @@ function accion_evento(DATOS) {
 function accion_cuy2(evento_valor_ganador,seg_para_animacion,seg_para_finevento) {
     EVENTO_ID = 1
     GANADOR_DE_EVENTO ="5"
-    TIEMPO_GIRO_CAJA = 10;
+    TIEMPO_GIRO_CAJA = 3000;
     $("#evento_actual_portada").text("#" +EVENTO_ID);
     TIEMPO_GANADOR_PORTADA = 10000;
 
@@ -492,10 +492,9 @@ function actualizar_contador_texto(tiempo_en_segundos,texto){
             }, 1000);
 }
 function actualizar_evento_titulo(EVENTO_ID){
-
-        $("#idevento_titulo").css("font-size", "7vh")
-        $("#idevento_titulo").html('<div style="font-size: 5vh">#</div>' + EVENTO_ID);
-        mostrar_div_tituloevento();
+    $("#idevento_titulo").css("font-size", "7vh")
+    $("#idevento_titulo").html('<div style="font-size: 5vh">#</div>' + EVENTO_ID);
+    mostrar_div_tituloevento();
 }
 
 function logueo_opcional(mensaje) {

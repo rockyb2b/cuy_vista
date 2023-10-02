@@ -540,12 +540,6 @@ function bloquear_teclas_mouse(){
     }, false);
     
 }
-
-
-
-
-
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */

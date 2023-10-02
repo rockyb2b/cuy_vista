@@ -1,48 +1,45 @@
 ///////////FUNCIONESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
 var index = 0;
-var archivos = ['images/glb/cuycaminando.glb', 'images/glb/cajagirando1.glb', 'images/glb/cuycabezagirando.glb', 
-// 'images/cuyChoqueGLB.glb'
-'images/glb/cuyestrellas.glb'
-// ,'images/glb/cuyesperando.glb'
-// ,'images/glb/cuypremio.glb'
-// ,'images/glb/cuysalto.glb'
-// ,'images/glb/tablero.glb'
+var archivos = [
+    'images/glb/cuycaminando.glb',
+    'images/glb/cajagirando1.glb',
+    'images/glb/cuycabezagirando.glb',
+    // 'images/cuyChoqueGLB.glb'
+    'images/glb/cuyestrellas.glb'
+    // ,'images/glb/cuyesperando.glb'
+    // ,'images/glb/cuypremio.glb'
+    // ,'images/glb/cuysalto.glb'
+    // ,'images/glb/tablero.glb'
 ];
 dt =0.03 // velocidad movimiento cuy
 dtrotacion = 0.05; // velocidad rotacion cuy;
 escalacuys = 0.25;
 escalacajagirando = 1;
-intervalo_consultaevento=2000;
-buscando_evento=false;
-ANIMACION_CUY=false;
-ANIMACION_CUY_PORTADA=false;
-TEXTO_NEON_PORTADA="¿A donde va el cuy? ¡Realiza Tu Apuesta!";
-TEXTO_CONTADOR="APUESTAS SE CIERRAN EN";
-TEXTO_ESPERAR_TERMINO_EVENTO="EVENTO TERMINA EN";
+intervalo_consultaevento = 2000;
+buscando_evento = false;
+ANIMACION_CUY = false;
+ANIMACION_CUY_PORTADA = false;
+TEXTO_NEON_PORTADA = "¿A donde va el cuy? ¡Realiza Tu Apuesta!";
+TEXTO_CONTADOR = "APUESTAS SE CIERRAN EN";
+TEXTO_ESPERAR_TERMINO_EVENTO = "EVENTO TERMINA EN";
 
 //TIEMPO_GANADOR_PORTADA=10000;
 function camara_mirar(objeto){
-        camera.position.x = objeto.position.x ;
-        camera.position.y = objeto.position.y + 1.6;
-        camera.position.z = objeto.position.z +5.5;
-        camera.lookAt(objeto.position);
+    camera.position.x = objeto.position.x ;
+    camera.position.y = objeto.position.y + 1.6;
+    camera.position.z = objeto.position.z +5.5;
+    camera.lookAt(objeto.position);
 }
 
-
-
 function animar_desvanacer() {
-
     animar=requestAnimationFrame(animar_desvanacer);
-
     camera1.lookAt(new THREE.Vector3(0, 0, 0));
     camera2.lookAt(new THREE.Vector3(0, 0, 0));
 
-
     quadmaterial.uniforms.mixRatio.value += valueToAdd;
     if (quadmaterial.uniforms.mixRatio.value > 1.25 || quadmaterial.uniforms.mixRatio.value < -0.25) {
-        // valueToAdd = -valueToAdd;
-    alert("termino");
-    cancelAnimationFrame(animar)
+        alert("termino");
+        cancelAnimationFrame(animar)
     }
 
     renderer.render(scene, camera1, rtTexture1);
@@ -50,15 +47,11 @@ function animar_desvanacer() {
     renderer.render(quadscene, cameraquad, null, true);
 }
 
-
-
-
-
 function camara_inicio(){
- camera.position.x = 0;
- camera.position.y = 10;
- camera.position.z = 0;
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.position.x = 0;
+    camera.position.y = 10;
+    camera.position.z = 0;
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
 }
 
 function animar_camara() {
@@ -71,76 +64,74 @@ function animar_camara() {
 }
 
 function camara_movimiento_inicio(hacia,camera,tiempo, callback){
-        var from = {
-            x: camera.position.x,
-            y: camera.position.y,
-            z: camera.position.z
-        };
-        var to = {
-            x: hacia.x,
-            y: hacia.y,
-            z: hacia.z
-        };
-        var tween = new TWEEN.Tween(from)
-            .to(to, tiempo)
-            .easing(TWEEN.Easing.Linear.None)
-            .onUpdate(function () {
-            camera.position.set(this.x, this.y, this.z);
+    var from = {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+    };
+    var to = {
+        x: hacia.x,
+        y: hacia.y,
+        z: hacia.z
+    };
+    var tween = new TWEEN.Tween(from)
+        .to(to, tiempo)
+        .easing(TWEEN.Easing.Linear.None)
+        .onUpdate(function () {
+        camera.position.set(this.x, this.y, this.z);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+    })
+        .onStart(function(){
+            //  camera.position.x=to.x;camera.position.z=to.z;camera.position.y=to.y
+        })
+        .onComplete(function () {
+            detener_var_animarcamara();
             camera.lookAt(new THREE.Vector3(0, 0, 0));
-        })
-            .onStart(function(){
-              //  camera.position.x=to.x;camera.position.z=to.z;camera.position.y=to.y
-            })
-            .onComplete(function () {
-                detener_var_animarcamara();
-               camera.lookAt(new THREE.Vector3(0, 0, 0));
-        })
-            .start();
+    })
+        .start();
 }
 
 function camara_movimiento_girando(hacia,camera,tiempo, callback){
-        var from = {
-            x: camera.position.x,
-            y: camera.position.y,
-            z: camera.position.z
-        };
-        var to = {
-            x: hacia.x,
-            y: hacia.y,
-            z: hacia.z
-        };
-        var tween = new TWEEN.Tween(from)
-            .to(to, tiempo)
-            .easing(TWEEN.Easing.Linear.None)
-            .onUpdate(function () {
-            camera.position.set(this.x, this.y, this.z);
-            camera.lookAt(new THREE.Vector3(0, 0, 0));
+    var from = {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+    };
+    var to = {
+        x: hacia.x,
+        y: hacia.y,
+        z: hacia.z
+    };
+    var tween = new TWEEN.Tween(from)
+        .to(to, tiempo)
+        .easing(TWEEN.Easing.Linear.None)
+        .onUpdate(function () {
+        camera.position.set(this.x, this.y, this.z);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+    })
+        .onStart(function(){
+            //  camera.position.x=to.x;camera.position.z=to.z;camera.position.y=to.y
         })
-            .onStart(function(){
-              //  camera.position.x=to.x;camera.position.z=to.z;camera.position.y=to.y
-            })
-            .onComplete(function () {
-                callback();
-        })
-            .start();
+        .onComplete(function () {
+            callback();
+    })
+        .start();
 }
 
-
-
 function get_caja(numero){
-    cajaobjeto={};
-    if(numero==0 || numero=="x"){
-        numero="x";
+    var cajaobjeto = {};
+    if(numero == 0 || numero == "x"){
+        numero = "x";
     }
     $(CAJAS_ARRAY).each(function(i,e){
-        if(e.name==numero){
-            cajaobjeto=e;
+        if(e.name == numero){
+            cajaobjeto = e;
             return false;
         }
     })
-    var worldposition=new THREE.Vector3();
+    var worldposition = new THREE.Vector3();
     cajaobjeto.getWorldPosition(worldposition);
-    posicion={nombre:numero,posicion:{x:worldposition.x,y:worldposition.y,z:worldposition.z}}
+    posicion = {nombre:numero,posicion:{x:worldposition.x,y:worldposition.y,z:worldposition.z}}
     return posicion;
 }
 function responsive_canvas() {
@@ -165,12 +156,12 @@ function cargarImagenes(srcs, callback) {
 function cargar_archivos() {
     var objLoader = new THREE.GLTFLoader();
     if (index > archivos.length - 1) {
-         otro=model.clone();////////////////////////
-        TIEMPO_FIN_RENDER=performance.now()-TIEMPO_RENDER;
-        TIEMPO_FIN_RENDER=(TIEMPO_FIN_RENDER/1000).toFixed(2);
+        otro = model.clone();////////////////////////
+        TIEMPO_FIN_RENDER = performance.now() - TIEMPO_RENDER;
+        TIEMPO_FIN_RENDER = (TIEMPO_FIN_RENDER/1000).toFixed(2);
         console.warn("FIN CARGA ARCHIVOS en "+TIEMPO_FIN_RENDER + " seg");
 
-           $("#JUEGO").show();
+        $("#JUEGO").show();
 
         if (ANIMACION_CUY_PORTADA == false) {
             INICIO_ANIMACION_CUY_PORTADA(); /*CUY PORTADA*/ ;
@@ -193,15 +184,15 @@ function cargar_archivos() {
             model.position.set(0, 0, 0);
             model.name = "CUY";
 
-            model.castShadow=true;
-            model.receiveShadow=true;
+            model.castShadow = true;
+            model.receiveShadow = true;
             scene.add(model);
             skeleton = new THREE.SkeletonHelper(model);
             var animations = gltf.animations;
             mixer = new THREE.AnimationMixer(model);
             mixer.clipAction(animations[0]).play();
         }
-    if (archivos[index] == "images/glb/cajagirando1.glb") {
+        if (archivos[index] == "images/glb/cajagirando1.glb") {
             modelCajaP = gltf.scenes[0];
             modelCajaP.traverse(function (objectCajaGira) {
                 if (objectCajaGira instanceof THREE.Mesh) {
@@ -211,12 +202,7 @@ function cargar_archivos() {
             modelCajaP.name="CAJA_GIRANDO";
             modelCajaP.scale.set(escalacajagirando,escalacajagirando,escalacajagirando);
             modelCajaP.position.set(0, 0, 0);
-            // modelCajaP.castShadow=true;
-            // modelCajaP.receiveShadow=true;
-
-            ////
             modelCajaP.position.y=-0.006;
-            //
 
             scene.add(modelCajaP);
             var animations = gltf.animations;
@@ -259,8 +245,7 @@ function cargar_archivos() {
             mixerCuyChoque = new THREE.AnimationMixer(modelCuyChoque);
             mixerCuyChoque.clipAction(animations[0]).play();
         }
-
-          if (archivos[index] =="images/glb/cuypremio.glb") {
+        if (archivos[index] =="images/glb/cuypremio.glb") {
             modelCuyPremio = gltf.scenes[0];
             modelCuyPremio.traverse(function (objeto) {
                 if (objeto instanceof THREE.Mesh) {
@@ -295,7 +280,7 @@ function cargar_archivos() {
             mixerCuyEsperando = new THREE.AnimationMixer(modelCuyEsperando);
             mixerCuyEsperando.clipAction(animations[0]).play();
         }
-         if (archivos[index] =="images/glb/cuysalto.glb") {
+        if (archivos[index] =="images/glb/cuysalto.glb") {
             modelCuySalto = gltf.scenes[0];
             modelCuySalto.traverse(function (objeto) {
                 if (objeto instanceof THREE.Mesh) {
@@ -319,25 +304,23 @@ function cargar_archivos() {
     } ,progreso_descarga );
 }
 
-tamano_total=14073552+3595876 +4225396 +3728832+ 2647408;  /*archivos glb para cargar*/
-cargado=0;
-sumatoria_descargado=0;
- progreso_descarga = function( xhr ) {
-  if ( xhr.lengthComputable ) {
-        falta=xhr.total-xhr.loaded;
-        cargado_estavuelta=xhr.loaded-cargado;
-        sumatoria_descargado=sumatoria_descargado+cargado_estavuelta;
-        //console.warn("cargado_estavuelta => "+formatBytes(cargado_estavuelta));
-        cargado=xhr.loaded;
-        if(falta===0){cargado=0;}
-        //console.log(cargado+ " falta "+falta+" -  tamaño :"+xhr.total +" =>"+formatBytes(xhr.total)+" TOTALARCHVOS=" +formatBytes(tamano_total))
-        var percentComplete = xhr.loaded / xhr.total * 100;
+tamano_total = 14073552 + 3595876 + 4225396 + 3728832 + 2647408;  /*archivos glb para cargar*/
+cargado = 0;
+sumatoria_descargado = 0;
+progreso_descarga = function( xhr ) {
+    if ( xhr.lengthComputable ) {
+        var falta = xhr.total-xhr.loaded;
+        var cargado_estavuelta = xhr.loaded-cargado;
+        sumatoria_descargado = sumatoria_descargado + cargado_estavuelta;
+        cargado = xhr.loaded;
+        if(falta === 0){cargado = 0;}
+        // var percentComplete = xhr.loaded / xhr.total * 100;
         var percentCompletadoTotal = sumatoria_descargado / tamano_total * 100;
-        if($("#cargador_overlay").length>0){
+        if($("#cargador_overlay").length > 0){
             $("#cargador_overlay").text(Math.round( percentCompletadoTotal,2)+"%")
         }
     //console.info( Math.round( percentComplete, 2 ) + '% downloaded' +"   %total= "+  Math.round( percentCompletadoTotal,2));
-  }
+    }
 };
 
 function mostrar_cuy_cargando(){
@@ -352,7 +335,6 @@ function ocultar_cuy_esperando(){
 }
 function mostrar_cuy_esperando(){
     $("#DIV_ESPERA").removeClass("SIN_ANIMACION").show();
-
 }
 
 function mostrar_div_eventoesperando(){
@@ -362,14 +344,12 @@ function ocultar_div_eventoesperando(callback){
     $("#DIV_ESPERANDOEVENTO").addClass("SIN_ANIMACION").fadeOut('500',function(){callback()});
 }
 
-
 function mostrar_div_tituloevento(){
-
     $("#DIV_TITULOEVENTO").removeClass("SIN_ANIMACION").fadeIn('1000');
 }
 function ocultar_div_tituloevento(){
-    $("#DIV_TITULOEVENTO").hide().addClass("SIN_ANIMACION");
-   if(typeof ganador_fireworks!=="undefined"){
+$("#DIV_TITULOEVENTO").hide().addClass("SIN_ANIMACION");
+    if(typeof ganador_fireworks!=="undefined"){
         ganador_fireworks.destruir();
     }
      if(typeof ganador_confeti!=="undefined"){
@@ -380,13 +360,13 @@ function mostrar_div_ganador(){
      // $("#DIV_GANADOR").show();
      // ocultar_div_tituloevento();
     $("#DIV_GANADOR")
-                    .off().on("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
-                                 function(e){
-                                    // do something here
-                                    $(".contenedor_cubo_ganador").addClass("latido_animacion");
-                                    $('#cubo_ganador img').shiningImage();
-                                    $(this).off(e);
-                                 });
+        .off().on("transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+                        function(e){
+                        // do something here
+                        $(".contenedor_cubo_ganador").addClass("latido_animacion");
+                        $('#cubo_ganador img').shiningImage();
+                        $(this).off(e);
+                        });
     $("#DIV_GANADOR").removeClass("SIN_ANIMACION_children")
                     .show()
                     .removeClass("off");
@@ -398,26 +378,26 @@ function mostrar_div_ganador(){
         ganador_confeti.destruir();
     }
 
-        ganador_confeti=$('#DIV_GANADOR').confeti();
-        ganador_fireworks=$('#DIV_GANADOR').fireworks({
-            n_stars : 0, //num of stars
-            twinkleFactor : .4, //how much stars 'twinkle'
-            maxStarRadius : 3,
-            minStrength : 1.5, //lowest firework power
-            maxStrength : 7, //highest firework power
-            minTrails : 15, //min particles
-            maxTrails : 40, //max particles
-            particleRadius : 2,
-            trailLength : 15, //particle trail length
-            delay : .4, // number of LIFEs between explosions
-            LIFE : 50, //life time of firework
+    ganador_confeti=$('#DIV_GANADOR').confeti();
+    ganador_fireworks=$('#DIV_GANADOR').fireworks({
+        n_stars : 0, //num of stars
+        twinkleFactor : .4, //how much stars 'twinkle'
+        maxStarRadius : 3,
+        minStrength : 1.5, //lowest firework power
+        maxStrength : 7, //highest firework power
+        minTrails : 15, //min particles
+        maxTrails : 40, //max particles
+        particleRadius : 2,
+        trailLength : 15, //particle trail length
+        delay : .4, // number of LIFEs between explosions
+        LIFE : 50, //life time of firework
 
-                 sound: true, 
-                 opacity: 1,
-                 particles:100,
-                 width: $('#DIV_GANADOR').width(),
-                 height: $('#DIV_GANADOR').height()
-         });
+                sound: true, 
+                opacity: 1,
+                particles:100,
+                width: $('#DIV_GANADOR').width(),
+                height: $('#DIV_GANADOR').height()
+        });
    if(typeof intervalo_cubo!=="undefined"){
         clearInterval(intervalo_cubo);
     }
@@ -451,27 +431,20 @@ function ocultar_div_ganador(){
 
 
 function ocultar_termometro_contador(){
-    // $("#evento_para_activar").hide()
-    // $("#termotetro_para_iniciar").hide();
-    // $("#contador_para_activar").hide();
-
     $("#barra_loading_tpi").stop().stop();
     if(typeof conteo_!="undefined"){
         clearInterval(conteo_);
         delete conteo_
     }
-
 }
 function reiniciar_termometro(){
-        // $("#barra_loading_tpi").css("width","0%");
-        $("#barra_loading_tpi").css("height","100%");
+    $("#barra_loading_tpi").css("height","100%");
 }
 function mostrar_termometro_contador(){
     $("#termotetro_para_iniciar").css("display:flex");
-     $("#termotetro_para_iniciar").show();
+    $("#termotetro_para_iniciar").show();
     $("#contador_para_activar").show();
     $("#evento_para_activar").show()
-
 }
 
 function detener_var_cuymoviendo(){
@@ -555,35 +528,31 @@ function detener_var_cuyesperando(){
             cancelAnimationFrame(var_cuyesperando);
             delete var_cuyesperando;
         }
-
 }
 
 function mostrar_cuymoviendo(){
-        model.visible = true; 
-        modelCajaP.visible = false;
-        modelCuyDudando.visible = false;       
-        modelCuyChoque.visible = false;
-
+    model.visible = true; 
+    modelCajaP.visible = false;
+    modelCuyDudando.visible = false;       
+    modelCuyChoque.visible = false;
 }
 function mostrar_cajagirando(){
-        modelCajaP.visible = true;
-        model.visible = false; 
-        modelCuyDudando.visible = false;       
-        modelCuyChoque.visible = false;
+    modelCajaP.visible = true;
+    model.visible = false; 
+    modelCuyDudando.visible = false;       
+    modelCuyChoque.visible = false;
 }
 function actualizar_cuyes_posicion(){
-     modelCuyDudando.position.x=model.position.x;
-        modelCuyDudando.position.y=model.position.y;
-        modelCuyDudando.position.z=model.position.z;
-        modelCuyChoque.position.x=model.position.x;
-        modelCuyChoque.position.y=model.position.y;
-        modelCuyChoque.position.z=model.position.z;
-
-
+    modelCuyDudando.position.x=model.position.x;
+    modelCuyDudando.position.y=model.position.y;
+    modelCuyDudando.position.z=model.position.z;
+    modelCuyChoque.position.x=model.position.x;
+    modelCuyChoque.position.y=model.position.y;
+    modelCuyChoque.position.z=model.position.z;
 }
 function reiniciar_cuy(){
     model.position.set(0,0,0);
-    a={x:model.position.x,
+    a = {x:model.position.x,
        y:model.position.y,
        z:model.position.z}
 
@@ -600,25 +569,24 @@ function reiniciar_cuy(){
         //INDICE_PUNTOS_CUY=0;
 }
 function reiniciar_loading(){
-  
-        clock = new THREE.Clock();
-        clockCuyDudando = new THREE.Clock();
-        clockCuyChoque= new THREE.Clock();
-        clockCajaP= new THREE.Clock();
-        t=0;
-        $("#barra_loading_tpi").css("height","100%");
-        //PUNTOS_CUY=null;
-        //INDICE_PUNTOS_CUY=0;
+    clock = new THREE.Clock();
+    clockCuyDudando = new THREE.Clock();
+    clockCuyChoque= new THREE.Clock();
+    clockCajaP = new THREE.Clock();
+    t=0;
+    $("#barra_loading_tpi").css("height","100%");
+    //PUNTOS_CUY=null;
+    //INDICE_PUNTOS_CUY=0;
 }
 
 function getPositionOtro(ganador,otro){
-            vector_ganador=new THREE.Vector3();
-            getObjeto_caja(ganador).getWorldPosition(vector_ganador);
-            otro.position.copy(vector_ganador);
-            otro.lookAt(0,0,0);
-            otro.translateZ(1);
-            posicionnueva=otro.getWorldPosition();
-            return {x:posicionnueva.x,y:0,z:posicionnueva.z}
+    vector_ganador = new THREE.Vector3();
+    getObjeto_caja(ganador).getWorldPosition(vector_ganador);
+    otro.position.copy(vector_ganador);
+    otro.lookAt(0,0,0);
+    otro.translateZ(1);
+    posicionnueva=otro.getWorldPosition();
+    return {x:posicionnueva.x,y:0,z:posicionnueva.z}
 }
 function getPositionOtroVector(ganador,otro){
     if(ganador=="0"){ganador="x";}
@@ -633,127 +601,111 @@ function getPositionOtroVector(ganador,otro){
     return vector;
 }
 function INICIO_ANIMACION_CUY_PORTADA(){
-    // mostrar_termometro_contador();
+    ANIMACION_CUY_PORTADA = true;
+    ANIMACION_CUY = false;
 
-//  mostrar_div_eventoesperando();
-        ANIMACION_CUY_PORTADA=true;
-        ANIMACION_CUY=false;
+    ocultar_cuy_cargando();
+    $.LoadingOverlay("hide");
+    t = 0  
+    timerotacion=0; 
+    detener_var_animarcamara();
+    ocultar_cuy_esperando();
+    animar_camara();
 
-        ocultar_cuy_cargando();
-        $.LoadingOverlay("hide");
-        t = 0  
-        timerotacion=0; 
-        detener_var_animarcamara();
-        ocultar_cuy_esperando();
-        animar_camara();
-
-        mostrar_cuymoviendo();
-        // camara_mirar(modelCajaP);
-        if(typeof a!="undefined"){
-            ULTIMO_PUNTO_CUY=a;
-        }
-        //reiniciar_cuy();///reiniciar posicion cuyes 0 0 0
-        //reiniciar_loading();
-        actualizar_cuyes_posicion();
-       
-        detener_var_cajagirando();
-        iniciar_animacion_cuy_portada();
+    mostrar_cuymoviendo();
+    // camara_mirar(modelCajaP);
+    if(typeof a!="undefined"){
+        ULTIMO_PUNTO_CUY=a;
+    }
+    //reiniciar_cuy();///reiniciar posicion cuyes 0 0 0
+    actualizar_cuyes_posicion();
+    
+    detener_var_cajagirando();
+    iniciar_animacion_cuy_portada();
 }
 function iniciar_animacion_cuy_portada(){
-    
         mixer.update(clock.getDelta());
         mixerCuyDudando.update(clockCuyDudando.getDelta());
         mixerCajaP.update(clockCajaP.getDelta());
-           
-
-            detener_var_cajagirando();
-            mostrar_cuymoviendo();
-       
-            cajax=getObjeto_caja("x");
-            maderas=[];
-            maderas.push(getObjeto_caja("madera"));
-            maderas.push(getObjeto_caja("madera2"));
-            posicionycajaxinicial=-9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
-            posicionfinalcaja=-11.4;//8.2;//3.4999993133545217//800;
-            cajax_posicioninicial= new THREE.Vector3() ; 
-            cajax.getWorldPosition(cajax_posicioninicial);
-            posicionmadera = new THREE.Vector3() ; 
-            getObjeto_caja("madera").getWorldPosition(posicionmadera);
-            dtcajax=0.2;
-            tcajax=0;
-            rotacionx_inicio=0;//-7.318557638911297e-33;
-            rotacionx_fin=-Math.PI / 2;//-1.4;
-            q1_cajax = new THREE.Quaternion().copy(cajax.quaternion);
-            q2_cajax = new THREE.Quaternion().copy(cajax.quaternion);
-            timerotacion = 0;
-            if(typeof controls!="undefined"){
-              controls.autoRotate = false;
-            }
-            inicio_tiempo=performance.now();
-            inicio={x:model.position.x,
-                    y:model.position.y,
-                    z:model.position.z};
-            spline = new THREE.CatmullRomCurve3(puntos_azar_inicio(inicio));
-            dtSPLINE=0.0015;
-            correr_spline_portada(inicio);
-            // camara_movimiento_inicio({x:0,y:10.3,z:0},camera,2500);
-            // iniciar_cuy(GANADOR_DE_EVENTO,TIEMPO_CUY);
+        detener_var_cajagirando();
+        mostrar_cuymoviendo();
+        cajax=getObjeto_caja("x");
+        maderas=[];
+        maderas.push(getObjeto_caja("madera"));
+        maderas.push(getObjeto_caja("madera2"));
+        posicionycajaxinicial=-9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
+        posicionfinalcaja=-11.4;//8.2;//3.4999993133545217//800;
+        cajax_posicioninicial= new THREE.Vector3() ; 
+        cajax.getWorldPosition(cajax_posicioninicial);
+        posicionmadera = new THREE.Vector3() ; 
+        getObjeto_caja("madera").getWorldPosition(posicionmadera);
+        dtcajax=0.2;
+        tcajax=0;
+        rotacionx_inicio=0;//-7.318557638911297e-33;
+        rotacionx_fin=-Math.PI / 2;//-1.4;
+        q1_cajax = new THREE.Quaternion().copy(cajax.quaternion);
+        q2_cajax = new THREE.Quaternion().copy(cajax.quaternion);
+        timerotacion = 0;
+        if(typeof controls!="undefined"){
+            controls.autoRotate = false;
+        }
+        inicio_tiempo=performance.now();
+        inicio={x:model.position.x,
+                y:model.position.y,
+                z:model.position.z};
+        spline = new THREE.CatmullRomCurve3(puntos_azar_inicio(inicio));
+        dtSPLINE=0.0015;
+        correr_spline_portada(inicio);
+        // camara_movimiento_inicio({x:0,y:10.3,z:0},camera,2500);
+        // iniciar_cuy(GANADOR_DE_EVENTO,TIEMPO_CUY);
 }
-
 
 ///*inicio desde ws*/
 function INICIO_ANIMACION_CUY(){
-        mixer.update(clock.getDelta());
-        mixerCuyDudando.update(clockCuyDudando.getDelta());
-        mixerCajaP.update(clockCajaP.getDelta());
-        ANIMACION_CUY=true;
-        // iniciogiro =  clockCajaP.getElapsedTime();
-        t = 0   /// tiempo movimiento cuy;
-        timerotacion=0; 
-        detener_var_animarcamara();
-        ocultar_cuy_esperando();
-        animar_camara();
+    mixer.update(clock.getDelta());
+    mixerCuyDudando.update(clockCuyDudando.getDelta());
+    mixerCajaP.update(clockCajaP.getDelta());
+    ANIMACION_CUY = true;
+    // iniciogiro =  clockCajaP.getElapsedTime();
+    t = 0   /// tiempo movimiento cuy;
+    timerotacion=0; 
+    detener_var_animarcamara();
+    ocultar_cuy_esperando();
+    animar_camara();
 
-        objeto = modelCajaP;    
-        X = objeto.position.x ;
-        Y = objeto.position.y + 1.6;
-        Z = objeto.position.z + 5.5;
-        mostrar_cajagirando();
-        //animar_desvanacer();
-        camara_movimiento_girando(
-            {x:X,y:Y,z:Z},
-            camera,
-            2000,
-            function(){
-                iniciogiro =  performance.now();
-                camara_mirar(modelCajaP);
-                if(typeof a != "undefined"){
-                    ULTIMO_PUNTO_CUY = a;
-                }
-                reiniciar_cuy();///reiniciar posicion cuyes 0 0 0
-                actualizar_cuyes_posicion();
-                if(typeof controls != "undefined"){
-                    //controls.autoRotate = true;
-                }
-                detener_var_cajagirando();
-                modelCajaP.visible = true;
-                cajagirando_animacion();
+    objeto = modelCajaP;    
+    X = objeto.position.x ;
+    Y = objeto.position.y + 1.6;
+    Z = objeto.position.z + 5.5;
+    mostrar_cajagirando();
+    //animar_desvanacer();
+    camara_movimiento_girando(
+        {x:X,y:Y,z:Z},
+        camera,
+        2000,
+        function(){
+            iniciogiro =  performance.now();
+            camara_mirar(modelCajaP);
+            if(typeof a != "undefined"){
+                ULTIMO_PUNTO_CUY = a;
             }
-        );
+            reiniciar_cuy();///reiniciar posicion cuyes 0 0 0
+            actualizar_cuyes_posicion();
+            if(typeof controls != "undefined"){
+                //controls.autoRotate = true;
+            }
+            detener_var_cajagirando();
+            modelCajaP.visible = true;
+            cajagirando_animacion();
+        }
+    );
 }
 
 function actualizar_div_ganador(nro_ganador){
     var GANADOR_DE_EVENTO=nro_ganador;
     var ganador_TEXTO=GANADOR_DE_EVENTO == 0 ? "x" : GANADOR_DE_EVENTO;
-    // var datos=getColor(estadistica,GANADOR_DE_EVENTO);
-
-    //$("#cubo_ganador").text(ganador_TEXTO);
-    // ganador_TEXTO="34";
     $("#cubo_ganador img").attr("src","img/numeros/"+ganador_TEXTO+".png");
-
     $("#span_idevento").text("#"+EVENTO_ID);
-    // $("#shape>div").css("background-color",datos.rgb).css("color",datos.rgbLetra);
-    // $("#shape>div").text(ganador_TEXTO);
 }
 
 function cajagirando_animacion() {
@@ -851,29 +803,29 @@ function ease(t) {
 
 ////////////////////nuevo random
 function generar_nueva_posicion_random(){
-        bfuncion_easing_indice = 0;//random_entero(0,EasingFunctions_array.length-1);
-        //console.warn("i= "+bfuncion_easing_indice);
+    bfuncion_easing_indice = 0;//random_entero(0,EasingFunctions_array.length-1);
+    //console.warn("i= "+bfuncion_easing_indice);
+    b = PUNTOS_CUY[INDICE_PUNTOS_CUY];
+    INDICE_PUNTOS_CUY++;
+    if(INDICE_PUNTOS_CUY > PUNTOS_CUY.length){
+        console.warn(INDICE_PUNTOS_CUY+ " ---------Cuy pasó length del array PUNTOS_CUY  --- ")
+        INDICE_PUNTOS_CUY = 0; 
         b = PUNTOS_CUY[INDICE_PUNTOS_CUY];
-        INDICE_PUNTOS_CUY++;
-        if(INDICE_PUNTOS_CUY > PUNTOS_CUY.length){
-            console.warn(INDICE_PUNTOS_CUY+ " ---------Cuy pasó length del array PUNTOS_CUY  --- ")
-            INDICE_PUNTOS_CUY = 0; 
-            b = PUNTOS_CUY[INDICE_PUNTOS_CUY];
-        }
-        return b;
+    }
+    return b;
 }
 /////////////////nuevo movimiento
 function generar_nueva_posicion_random2(rango){
     // rango=2.,5
-       randomx = Math.random() >= 0.5 ? Math.abs(parseFloat(random_posicion(0, rango))) : -Math.abs(parseFloat(random_posicion(0,rango))) ;  // rango x=> -2.5  a   2.5 
-       randomz = Math.random() >= 0.5 ? Math.abs(parseFloat(random_posicion(0, rango))) : -Math.abs(parseFloat(random_posicion(0, rango))); // rango z=> -2.5  a   2.5
-       b = { x: randomx, y: 0, z: randomz  };
-       return b;
+    randomx = Math.random() >= 0.5 ? Math.abs(parseFloat(random_posicion(0, rango))) : -Math.abs(parseFloat(random_posicion(0,rango))) ;  // rango x=> -2.5  a   2.5 
+    randomz = Math.random() >= 0.5 ? Math.abs(parseFloat(random_posicion(0, rango))) : -Math.abs(parseFloat(random_posicion(0, rango))); // rango z=> -2.5  a   2.5
+    b = { x: randomx, y: 0, z: randomz  };
+    return b;
 }
 
 function puntos_azar(){
-    arrayvector=[];
-    for(a=0;a<10;a++){
+    arrayvector = [];
+    for(a = 0;a < 10; a++){
         nuevo=generar_nueva_posicion_random2(2.35);
         arrayvector.push(new THREE.Vector3(nuevo.x,0,nuevo.z))
     }
@@ -1065,8 +1017,8 @@ function callback_ganador(){
                     ocultar_div_ganador();
                     t = 0;
                     ANIMACION_CUY=false;
-                    iniciar_websocketservidor();
-                    ANIMACION_CUY_PORTADA=false;
+                    //iniciar_websocketservidor();
+                    ANIMACION_CUY_PORTADA = false;
                     INICIO_ANIMACION_CUY_PORTADA();
                 
                 },TIEMPO_GANADOR_PORTADA);
@@ -1125,42 +1077,35 @@ function mover_cuyrandom() {    ///var_cuymoviendo  => animationframe
                     mover_a_ganador=true;
                     // b=get_caja(GANADOR_DE_EVENTO).posicion;
                     if(GANADOR_DE_EVENTO=="x" || GANADOR_DE_EVENTO=="0"){
-                          bfuncion_easing_indice=7;//easeInQuart
-                          console.log("X o O");
-                         // b=getObjeto_caja("madera").getWorldPosition();
-                         b=new THREE.Vector3();
-                         getObjeto_caja("madera").getWorldPosition(b);
-                         random_tiempo();
+                        bfuncion_easing_indice=7;//easeInQuart
+                        console.log("X o O");
+                        b=new THREE.Vector3();
+                        getObjeto_caja("madera").getWorldPosition(b);
+                        random_tiempo();
                     }else{
+                        posicion_fin_caja= new THREE.Vector3();
+                        getObjeto_caja(GANADOR_DE_EVENTO).getWorldPosition(posicion_fin_caja);
+                        posicion_fin_caja.y=0;
+                        CUY_CORRIENDO = false;
+                        puntosspline=[];
+                        posicionmodel=new THREE.Vector3();
+                        model.getWorldPosition(posicionmodel);
 
-                            posicion_fin_caja= new THREE.Vector3();
-                            getObjeto_caja(GANADOR_DE_EVENTO).getWorldPosition(posicion_fin_caja);
-                            posicion_fin_caja.y=0;
-                            CUY_CORRIENDO = false;
-                            puntosspline=[];
-                            posicionmodel=new THREE.Vector3();
-                            model.getWorldPosition(posicionmodel);
-
-                            puntootro.y=0;
-                            puntosspline.push(posicionmodel);
-                            puntosspline.push(puntootro);
-                            puntosspline.push(posicion_fin_caja);
-                            // spline= new THREE.SplineCurve3(puntosspline);
-                            spline= new THREE.CatmullRomCurve3(puntosspline);
-                            // linea_camino();
-                            t=0;
-                            dtSPLINE=0.025;
-                            dist_spline=spline.getLength();
-                            // console.info("dist_spline "+dist_spline);
-                            if(dist_spline>4){
-                                dtSPLINE=0.009;
-                            }
-        //                     // linea_camino();
-                            correr_spline();
-                           // b=get_caja(GANADOR_DE_EVENTO).posicion;
+                        puntootro.y=0;
+                        puntosspline.push(posicionmodel);
+                        puntosspline.push(puntootro);
+                        puntosspline.push(posicion_fin_caja);
+                        // spline= new THREE.SplineCurve3(puntosspline);
+                        spline= new THREE.CatmullRomCurve3(puntosspline);
+                        t = 0;
+                        dtSPLINE=0.025;
+                        dist_spline=spline.getLength();
+                        // console.info("dist_spline "+dist_spline);
+                        if(dist_spline>4){
+                        dtSPLINE=0.009;
+                        }
+                        correr_spline();
                     }
-                    //console.log(b);
-                   // random_tiempo();
             }  
             else { ///movera ganador true  => CUY EN POSICION DE CAJA, FINALIZAR ANIMACION
                 CUY_CORRIENDO = false;
@@ -1187,13 +1132,13 @@ function mover_cuyrandom() {    ///var_cuymoviendo  => animationframe
                 cuydudando();
                 tiempodudando=Math.random() * (10 - 1) + 1; 
                 setTimeout(function(){
-                   generar_nueva_posicion_random();//b
+                   generar_nueva_posicion_random();
                    random_tiempo();
                 },tiempodudando*100);
             }
             else{
                 detener_var_cuydudando();
-                generar_nueva_posicion_random();//b
+                generar_nueva_posicion_random();
                 random_tiempo();
             }
         }  ///fin else ms >tiempo
@@ -1225,15 +1170,14 @@ function iniciar_tiempo_random(tiempo) {
     cuydudando();
     setTimeout(function(){
         detener_var_cuydudando();
-        generar_nueva_posicion_random();//b
+        generar_nueva_posicion_random();
         random_tiempo();
     },3500);
 
 }
 function random_tiempo(){
     if (typeof var_cuymoviendo === "undefined") {
-        rotarono=b.rotarono;//Math.random() >= 0.5 ?true:false;
-        //rotarono=false;
+        rotarono = b.rotarono;//Math.random() >= 0.5 ?true:false;
         t = 0;  ///coeficiente
         aumento = 0;
      
@@ -1245,7 +1189,6 @@ function random_tiempo(){
             model.lookAt(b.x,b.y,b.z);
             q2 = new THREE.Quaternion().copy(model.quaternion); timerotacion = 0;
         }
-
         detener_animacion();///ant
         detener_var_cuymoviendo();
         detener_var_cuychoque();
