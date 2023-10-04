@@ -116,13 +116,10 @@ function init(host, port) {
             switch (tipo) {
                 case "eventoJSON":
                     pedir_hora = false;
-                    //console.info(jsondecode);
                     EVENTO_DATOS = JSON.parse(jsondecode.mensaje);
                     accion_evento(EVENTO_DATOS); /////////////////////////////////////////******//////////////////
                     break;
-                    //reloj_websockets(msg.data,eventoactual.fechaFinEvento,eventoactual.segBloqueoAntesEvento);
             }
-
         };
         socket.onerror = function(msg) {
             socket.close();
@@ -223,7 +220,6 @@ function logerror(msg) {
 
 //function onkey(event){ if(event.keyCode==13){ send(); } }
 
-
 //////////////////////////////////////////NUEVO ULTIMO///////////////////////////////////////////////////////////
 
 function accion_evento(DATOS) {
@@ -254,7 +250,7 @@ function accion_evento(DATOS) {
         FECHA_ANIMACION = EVENTO_ACTUAL.fecha_animacion;
         FECHA_ANIMACION = moment(FECHA_ANIMACION, "YYYY-MM-DD HH:mm:ss a");
 
-        segundos_total_espera_evento=FECHA_ANIMACION.diff(FECHA_INICIO_EVENTO, 'seconds');
+        segundos_total_espera_evento = FECHA_ANIMACION.diff(FECHA_INICIO_EVENTO, 'seconds');
 
         ahora = moment(hora_servidor); //.format("YYYY-MM-DD HH:mm:ss a");
         segundos_para_fin_evento = FECHA_FIN_EVENTO.diff(ahora, 'seconds');
@@ -497,14 +493,8 @@ function actualizar_evento_titulo(EVENTO_ID){
     mostrar_div_tituloevento();
 }
 
-function logueo_opcional(mensaje) {
-    if (LOGUEO) {
-        console.log(mensaje)
-    }
-}
-
 function getColor(array_estadistica, buscar) {
-    obj = {};
+    var obj = {};
     $(array_estadistica).each(function(i, e) {
         if (e.valorapuesta == buscar) {
             obj = e;
@@ -513,16 +503,4 @@ function getColor(array_estadistica, buscar) {
 
     });
     return obj;
-}
-function log_eventofechas(){
-    if (logueo_websockets) {
-      console.info("INI= "+FECHA_INICIO_EVENTO.format("YYYY-MM-DD HH:mm:ss a") + " - FIN="+FECHA_FIN_EVENTO.format("YYYY-MM-DD HH:mm:ss a")
-                  +" ACTUAL=  "+ ahora.format("YYYY-MM-DD HH:mm:ss a")
-                  +" - ANIMACIÓN= "+moment(FECHA_ANIMACION).format("YYYY-MM-DD HH:mm:ss a")
-                  +"--SEG. PARA ANIMACIÓN= "+segundos_para_animacion
-                  +" segBloqueoAntesAnimacion="+EVENTO_ACTUAL.segBloqueoAntesAnimacion
-                  +" segCajaGirando="+EVENTO_ACTUAL.segCajaGirando
-
-           );
-  }
 }

@@ -1,6 +1,6 @@
 class Archivos {
     constructor(options) {
-        // this.cuy = options.cuy_clase;
+        this.cuy = options.cuy;
         this.index = 0;
         this.archivos = options.archivos;
         // [
@@ -13,6 +13,9 @@ class Archivos {
         this.tamano_total = 14073552 + 3595876 + 4225396 + 3728832 + 2647408;  /*archivos glb para cargar*/
         this.cargado = 0;
         this.sumatoria_descargado = 0;
+        this.escalacuys = 0.25;
+        this.escalacajagirando = 1;
+
     }
   
     cargarArchivos() {
@@ -35,129 +38,129 @@ class Archivos {
   
         objLoader.load(this.archivos[this.index], (gltf) => {
             // Your code for loading each file here
-            if (this.archivos[index] == "images/glb/cuycaminando.glb") {
-                window.model = gltf.scenes[0];
-                window.model.traverse(function (object) {
+            if (this.archivos[this.index] == "images/glb/cuycaminando.glb") {
+                this.cuy.model = gltf.scenes[0];
+                this.cuy.model.traverse(function (object) {
                     if (object instanceof THREE.Mesh) {
                         object.castShadow = true
                     }
                 });
-                window.model.scale.set(escalacuys, escalacuys, escalacuys);
-                window.model.position.set(0, 0, 0);
-                window.model.name = "CUY";
+                this.cuy.model.scale.set(this.escalacuys, this.escalacuys, this.escalacuys);
+                this.cuy.model.position.set(0, 0, 0);
+                this.cuy.model.name = "CUY";
 
-                window.model.castShadow = true;
-                window.model.receiveShadow = true;
-                (window.scene).add(window.model);
-                window.skeleton = new THREE.SkeletonHelper(window.model);
+                this.cuy.model.castShadow = true;
+                this.cuy.model.receiveShadow = true;
+                this.cuy.scene.add(this.cuy.model);
+                this.cuy.skeleton = new THREE.SkeletonHelper(this.cuy.model);
                 var animations = gltf.animations;
-                window.mixer = new THREE.AnimationMixer(window.model);
-                window.mixer.clipAction(animations[0]).play();
+                this.cuy.mixer = new THREE.AnimationMixer(this.cuy.model);
+                this.cuy.mixer.clipAction(animations[0]).play();
             }
-            if (this.archivos[index] == "images/glb/cajagirando1.glb") {
-                window.modelCajaP = gltf.scenes[0];
-                window.modelCajaP.traverse(function (objectCajaGira) {
+            if (this.archivos[this.index] == "images/glb/cajagirando1.glb") {
+                this.cuy.modelCajaP = gltf.scenes[0];
+                this.cuy.modelCajaP.traverse(function (objectCajaGira) {
                     if (objectCajaGira instanceof THREE.Mesh) {
                         //objectCajaGira.castShadow = true
                     }
                 });
-                window.modelCajaP.name = "CAJA_GIRANDO";
-                window.modelCajaP.scale.set(escalacajagirando,escalacajagirando,escalacajagirando);
-                window.modelCajaP.position.set(0, 0, 0);
-                window.modelCajaP.position.y=-0.006;
+                this.cuy.modelCajaP.name = "CAJA_GIRANDO";
+                this.cuy.modelCajaP.scale.set(this.escalacajagirando,this.escalacajagirando,this.escalacajagirando);
+                this.cuy.modelCajaP.position.set(0, 0, 0);
+                this.cuy.modelCajaP.position.y=-0.006;
 
-                window.scene.add(window.modelCajaP);
+                this.cuy.scene.add(this.cuy.modelCajaP);
                 var animations = gltf.animations;
             
-                window.mixerCajaP = new THREE.AnimationMixer(window.modelCajaP);
-                window.mixerCajaP.clipAction(animations[0]).play();
+                this.cuy.mixerCajaP = new THREE.AnimationMixer(this.cuy.modelCajaP);
+                this.cuy.mixerCajaP.clipAction(animations[0]).play();
             }
-            if (this.archivos[index] == "images/glb/cuycabezagirando.glb") {
-                window.modelCuyDudando = gltf.scenes[0];
-                window.modelCuyDudando.castShadow=true;
-                window.modelCuyDudando.receiveShadow=true;
-                window.modelCuyDudando.traverse(function (objectCuyDudando) {
+            if (this.archivos[this.index] == "images/glb/cuycabezagirando.glb") {
+                this.cuy.modelCuyDudando = gltf.scenes[0];
+                this.cuy.modelCuyDudando.castShadow=true;
+                this.cuy.modelCuyDudando.receiveShadow=true;
+                this.cuy.modelCuyDudando.traverse(function (objectCuyDudando) {
                     if (objectCuyDudando instanceof THREE.Mesh) {
                         objectCuyDudando.castShadow = true
                     }
                 });
-                window.modelCuyDudando.name = "CUY_DUDANDO";
+                this.cuy.modelCuyDudando.name = "CUY_DUDANDO";
 
-                window.modelCuyDudando.scale.set(escalacuys, escalacuys, escalacuys);
-                window.modelCuyDudando.position.set(0, 0, 0);
-                window.scene.add(window.modelCuyDudando);
+                this.cuy.modelCuyDudando.scale.set(this.escalacuys, this.escalacuys, this.escalacuys);
+                this.cuy.modelCuyDudando.position.set(0, 0, 0);
+                this.cuy.scene.add(this.cuy.modelCuyDudando);
                 var animations = gltf.animations;
-                window.mixerCuyDudando = new THREE.AnimationMixer(window.modelCuyDudando);
-                window.mixerCuyDudando.clipAction(animations[0]).play();
+                this.cuy.mixerCuyDudando = new THREE.AnimationMixer(this.cuy.modelCuyDudando);
+                this.cuy.mixerCuyDudando.clipAction(animations[0]).play();
             }
-            if (this.archivos[index] =="images/glb/cuyestrellas.glb") {
-                window.modelCuyChoque = gltf.scenes[0];
-                window.modelCuyChoque.traverse(function (objectCuyChoque) {
+            if (this.archivos[this.index] =="images/glb/cuyestrellas.glb") {
+                this.cuy.modelCuyChoque = gltf.scenes[0];
+                this.cuy.modelCuyChoque.traverse(function (objectCuyChoque) {
                     if (objectCuyChoque instanceof THREE.Mesh) {
                         objectCuyChoque.castShadow = true
                     }
                 });
-                window.modelCuyChoque.castShadow=true;
-                window.modelCuyChoque.receiveShadow=true;
-                window.modelCuyChoque.name = "CUY_CHOQUE";
-                window.modelCuyChoque.scale.set(escalacuys, escalacuys, escalacuys);
-                window.modelCuyChoque.position.set(0, 0, 0);
-                window.scene.add(window.modelCuyChoque);
+                this.cuy.modelCuyChoque.castShadow=true;
+                this.cuy.modelCuyChoque.receiveShadow=true;
+                this.cuy.modelCuyChoque.name = "CUY_CHOQUE";
+                this.cuy.modelCuyChoque.scale.set(this.escalacuys, this.escalacuys, this.escalacuys);
+                this.cuy.modelCuyChoque.position.set(0, 0, 0);
+                this.cuy.scene.add(this.cuy.modelCuyChoque);
                 var animations = gltf.animations;
-                window.mixerCuyChoque = new THREE.AnimationMixer(window.modelCuyChoque);
-                window.mixerCuyChoque.clipAction(animations[0]).play();
+                this.cuy.mixerCuyChoque = new THREE.AnimationMixer(this.cuy.modelCuyChoque);
+                this.cuy.mixerCuyChoque.clipAction(animations[0]).play();
             }
-            if (this.archivos[index] =="images/glb/cuypremio.glb") {
-                window.modelCuyPremio = gltf.scenes[0];
-                window.modelCuyPremio.traverse(function (objeto) {
+            if (this.archivos[this.index] =="images/glb/cuypremio.glb") {
+                this.cuy.modelCuyPremio = gltf.scenes[0];
+                this.cuy.modelCuyPremio.traverse(function (objeto) {
                     if (objeto instanceof THREE.Mesh) {
                         objeto.castShadow = true
                     }
                 });
-                window.modelCuyPremio.castShadow=true;
-                window.modelCuyPremio.receiveShadow=true;
-                window.modelCuyPremio.name = "CUY_PREMIO";
-                window.modelCuyPremio.scale.set(escalacuys, escalacuys, escalacuys);
-                window.modelCuyPremio.position.set(0, 0, 0);
-                window.scene.add(window.modelCuyPremio);
+                this.cuy.modelCuyPremio.castShadow=true;
+                this.cuy.modelCuyPremio.receiveShadow=true;
+                this.cuy.modelCuyPremio.name = "CUY_PREMIO";
+                this.cuy.modelCuyPremio.scale.set(this.escalacuys, this.escalacuys, this.escalacuys);
+                this.cuy.modelCuyPremio.position.set(0, 0, 0);
+                this.cuy.scene.add(this.cuy.modelCuyPremio);
                 var animations = gltf.animations;
-                window.mixerCuyPremio = new THREE.AnimationMixer(window.modelCuyPremio);
-                window.mixerCuyPremio.clipAction(animations[0]).play();
+                this.cuy.mixerCuyPremio = new THREE.AnimationMixer(this.cuy.modelCuyPremio);
+                this.cuy.mixerCuyPremio.clipAction(animations[0]).play();
             }
 
-            if (this.archivos[index] =="images/glb/cuyesperando.glb") {
-                window.modelCuyEsperando = gltf.scenes[0];
-                window.modelCuyEsperando.traverse(function (objeto) {
+            if (this.archivos[this.index] =="images/glb/cuyesperando.glb") {
+                this.cuy.modelCuyEsperando = gltf.scenes[0];
+                this.cuy.modelCuyEsperando.traverse(function (objeto) {
                     if (objeto instanceof THREE.Mesh) {
                         objeto.castShadow = true
                     }
                 });
-                window.modelCuyEsperando.castShadow=true;
-                window.modelCuyEsperando.receiveShadow=true;
-                window.modelCuyEsperando.name = "CUY_PREMIO";
-                window.modelCuyEsperando.scale.set(escalacuys, escalacuys, escalacuys);
-                window.modelCuyEsperando.position.set(0, 0, 0);
-                window.scene.add(window.modelCuyEsperando);
+                this.cuy.modelCuyEsperando.castShadow=true;
+                this.cuy.modelCuyEsperando.receiveShadow=true;
+                this.cuy.modelCuyEsperando.name = "CUY_PREMIO";
+                this.cuy.modelCuyEsperando.scale.set(this.escalacuys, this.escalacuys, this.escalacuys);
+                this.cuy.modelCuyEsperando.position.set(0, 0, 0);
+                this.cuy.scene.add(this.cuy.modelCuyEsperando);
                 var animations = gltf.animations;
-                window.mixerCuyEsperando = new THREE.AnimationMixer(window.modelCuyEsperando);
-                window.mixerCuyEsperando.clipAction(animations[0]).play();
+                this.cuy.mixerCuyEsperando = new THREE.AnimationMixer(this.cuy.modelCuyEsperando);
+                this.cuy.mixerCuyEsperando.clipAction(animations[0]).play();
             }
-            if (this.archivos[index] =="images/glb/cuysalto.glb") {
-                window.modelCuySalto = gltf.scenes[0];
-                window.modelCuySalto.traverse(function (objeto) {
+            if (this.archivos[this.index] =="images/glb/cuysalto.glb") {
+                this.cuy.modelCuySalto = gltf.scenes[0];
+                this.cuy.modelCuySalto.traverse(function (objeto) {
                     if (objeto instanceof THREE.Mesh) {
                         objeto.castShadow = true
                     }
                 });
-                window.modelCuySalto.castShadow=true;
-                window.modelCuySalto.receiveShadow=true;
-                window.modelCuySalto.name = "CUY_PREMIO";
-                window.modelCuySalto.scale.set(escalacuys, escalacuys, escalacuys);
-                window.modelCuySalto.position.set(0, 0, 0);
-                window.scene.add(window.modelCuySalto);
+                this.cuy.modelCuySalto.castShadow=true;
+                this.cuy.modelCuySalto.receiveShadow=true;
+                this.cuy.modelCuySalto.name = "CUY_PREMIO";
+                this.cuy.modelCuySalto.scale.set(this.escalacuys, this.escalacuys, this.escalacuys);
+                this.cuy.modelCuySalto.position.set(0, 0, 0);
+                this.cuy.scene.add(this.cuy.modelCuySalto);
                 var animations = gltf.animations;
-                window.mixerCuySalto = new THREE.AnimationMixer(window.modelCuySalto);
-                window.mixerCuySalto.clipAction(animations[0]).play();
+                this.cuy.mixerCuySalto = new THREE.AnimationMixer(this.cuy.modelCuySalto);
+                this.cuy.mixerCuySalto.clipAction(animations[0]).play();
             }
             this.index++;
             this.cargarArchivos();
@@ -171,7 +174,7 @@ class Archivos {
             this.cargado = xhr.loaded;
             if(falta === 0)
             {
-                cargado = 0;
+                this.cargado = 0;
             }
             var percentCompletadoTotal = this.sumatoria_descargado / this.tamano_total * 100;
             if($("#cargador_overlay").length > 0){

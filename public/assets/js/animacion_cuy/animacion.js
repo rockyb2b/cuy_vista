@@ -1,5 +1,4 @@
 // import { Archivos } from './cuy_clases/archivos_class.js';
-
 $.LoadingOverlay("show");
 $(".loadingoverlay").append($('<div id="cargador_overlay" style="font-family:Arial;position: relative; left: 8%;width:7%;height: 10%; text-align:center;font-size:8vh;color:black">--</div>'))
 $(".loadingoverlay").css("background-color","rgba(255, 255, 255, 0.3)");
@@ -16,6 +15,7 @@ var  EVENTO_ID = "";
 
 var VENTANA_ACTIVA = true;
 var EVENTO_YA_PASO = false;
+
 window.addEventListener('blur', function() {
    //not running full
    VENTANA_ACTIVA = false;
@@ -63,11 +63,11 @@ var i = 0;
 var controls;//THREE.OrbitControls
 
 function getObjeto_caja(nombrebuscar){
-    arraycajas = modelCaja.children[0].children[0].children[0].children;
-    objetoretornar=null;
+    var arraycajas = modelCaja.children[0].children[0].children[0].children;
+    objetoretornar = null;
     $(arraycajas).each(function(i,e){
         // nombre=e.material.map.name;///1.png
-         nombre=e.name;///1.png
+         nombre = e.name;///1.png
         //nombre=nombre.substring(0,nombre.indexOf("."));
         if(nombre==nombrebuscar){
             objetoretornar= e;
@@ -79,14 +79,14 @@ function getObjeto_caja(nombrebuscar){
 
 function get_maderas(){
     var maderas = [];
-    arraycajas = modelCaja.children[0].children[0].children;
+    var arraycajas = modelCaja.children[0].children[0].children[0];
     $(arraycajas).each(function(i,e){
-        nombre=e.name;///1.png
-        if(nombre=="madera" || nombre=="madera2" ){
+        nombre = e.name;///1.png
+        if(nombre == "madera" || nombre == "madera2" ){
             maderas.push(e);
         }
     })
-return maderas;
+    return maderas;
 }
 
 function INICIAR_RENDER() {
@@ -263,32 +263,13 @@ function CargarEstadistica(IdJuego) {
     });
 }
 
-function CargarEst() {    
-    var url = document.location.origin + "/DatosEstadisticaFK";
-    $.ajax({
-        url: url,
-        type: "POST",
-        contentType: "application/json",
-        beforeSend: function () {
-        },
-        complete: function () {
-        },
-        success: function (response) { 
-            calcular_estadisticas(response.estadistica);
-          
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-        }
-    });
+function detener_timeout_conexionwebsockets(){
+    if(typeof revisar_ya_conecto != "undefined"){
+        clearInterval(revisar_ya_conecto);
+        revisar_ya_conecto = null;
+    } 
 }
 
-function detener_timeout_conexionwebsockets(){
-      if(typeof revisar_ya_conecto!="undefined"){
-        clearInterval(revisar_ya_conecto);revisar_ya_conecto=null;
-      } 
-}
-function timeout_conexionwebsockets(){
-}
 function crear_toastr_websockets_error(){
     if(ANIMACION_CUY == false){
         if(typeof toasr_websockets_error == "undefined"){
@@ -345,45 +326,45 @@ function ocultar_toasr_servidor_error(){
 }
 
 function iniciar_websocketservidor(){
-        ocultar_cuy_cargando();
-        $.LoadingOverlay("hide");
-        ocultar_toasr_nohay_evento();
-        ocultar_toasr_servidor_error()
-        if(socket!=null && socket.readyState==1){
-            if(socket.readyState==0){
-                console.info("socket.readyState==0");
+    ocultar_cuy_cargando();
+    $.LoadingOverlay("hide");
+    ocultar_toasr_nohay_evento();
+    ocultar_toasr_servidor_error()
+    if(socket != null && socket.readyState == 1){
+        if(socket.readyState==0){
+            console.info("socket.readyState==0");
+        }
+        inicio_pedir_hora = performance.now();
+        pedir_hora = true;
+        timeout_pedir_hora = setInterval(function(){
+            if(pedir_hora){
+                crear_toastr_websockets_error();
             }
-            inicio_pedir_hora=performance.now();
-            pedir_hora=true;
-            timeout_pedir_hora=setInterval(function(){
-                if(pedir_hora){
-                    crear_toastr_websockets_error();
+            else{
+                clearInterval(timeout_pedir_hora);
+            }
+        },6000);
+        console.warn(performance.now() +" YA CONECTADO, pedir datos");
+        pedir_eventoJSON();///INICIO_ANIMACION_CUY despues de recibir hora de servidor ///////////////************///
+    }
+    else{
+        console.warn(performance.now() +"INICIANDO CONEXIÓN ");
+        CONECTADO__A_SERVIDORWEBSOCKET=false;
+        //inicio_intento_conexion=performance.now();
+        connectarWebSockets(IPSERVIDOR_WEBSOCKETS,PUERTO_WEBSOCKETS);  ///en archivo ClaseWebSockets.js
+        revisar_ya_conecto = setInterval(function(){
+                if(CONECTADO__A_SERVIDORWEBSOCKET){
+                    if(typeof toasr_websockets_error!="undefined"){
+                        toasr_websockets_error.hide();
+                    }
+                    clearInterval(revisar_ya_conecto);
                 }
                 else{
-                    clearInterval(timeout_pedir_hora);
+                    crear_toastr_websockets_error();
                 }
-            },6000);
-            console.warn(performance.now() +" YA CONECTADO, pedir datos");
-            pedir_eventoJSON();///INICIO_ANIMACION_CUY despues de recibir hora de servidor ///////////////************///
-        }
-        else{
-              console.warn(performance.now() +"INICIANDO CONEXIÓN ");
-              CONECTADO__A_SERVIDORWEBSOCKET=false;
-              //inicio_intento_conexion=performance.now();
-              connectarWebSockets(IPSERVIDOR_WEBSOCKETS,PUERTO_WEBSOCKETS);  ///en archivo ClaseWebSockets.js
-                revisar_ya_conecto=setInterval(function(){
-                        if(CONECTADO__A_SERVIDORWEBSOCKET){
-                            if(typeof toasr_websockets_error!="undefined"){
-                                toasr_websockets_error.hide();
-                            }
-                            clearInterval(revisar_ya_conecto);
-                        }
-                        else{
-                           crear_toastr_websockets_error();
-                        }
-                },1000);
+        },1000);
 
-        }
+    }
 }
 
 function calcular_estadisticas(array_estadisticas){
@@ -396,35 +377,35 @@ function calcular_estadisticas(array_estadisticas){
         $("#"+value.valorapuesta).prev().css("color",value.rgbLetra)
     });
 
-    rgb1=$("#color1").attr("data-color")
-    rgb2=$("#color2").attr("data-color")
-    rgb3=$("#cajaB").attr("data-color")
-    rango1_12=0
-    rango13_24=0
-    rango25_36=0
-    color1=0
-    color2=0;
-    color3=0;
+    rgb1 = $("#color1").attr("data-color")
+    rgb2 = $("#color2").attr("data-color")
+    rgb3 = $("#cajaB").attr("data-color")
+    rango1_12 = 0
+    rango13_24 = 0
+    rango25_36 = 0
+    color1 = 0
+    color2 = 0;
+    color3 = 0;
 
     $(estadistica).each(function(i,e){
-        valor=parseInt(e.valorapuesta)
-        repetidos=parseInt(e.Repetidos);
-        color=e.rgb;
+        valor = parseInt(e.valorapuesta)
+        repetidos = parseInt(e.Repetidos);
+        color = e.rgb;
 
-        if(valor>0 && valor<=12){
+        if(valor > 0 && valor <= 12){
             rango1_12=rango1_12+repetidos;
         }
-        if(valor>12 && valor<=24){
+        if(valor > 12 && valor <= 24){
             rango13_24=rango13_24+repetidos;
         }
-        if(valor>24 && valor<=36){
+        if(valor > 24 && valor <= 36){
             rango25_36=rango25_36+repetidos;
         }
         if(valor==0){
-            color0=repetidos;
+            color0 = repetidos;
         }
         if(color==rgb1){
-            color1=color1+repetidos;
+            color1 = color1+repetidos;
         }
         if(color==rgb2){
             color2=color2+repetidos;

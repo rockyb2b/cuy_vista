@@ -56,7 +56,7 @@ function camara_inicio(){
 
 function animar_camara() {
     TWEEN.update();
-    var_animarcamara=requestAnimationFrame(animar_camara);
+    var_animarcamara = requestAnimationFrame(animar_camara);
     renderer.render(scene, camera);
     if(typeof controls!="undefined"){
         controls.update();
@@ -964,13 +964,10 @@ function cuy_rotacionrandom() {//var_cuy_rotando
     model.visible = true;
     modelCuyDudando.visible = false;
     modelCuyChoque.visible = false; 
-    // dtrotacion = 0.05; // changed
-    // timerotacion += dtrotacion;
-    timerotacion=parseFloat(timerotacion+dtrotacion).toFixed(5);
-    timerotacion=parseFloat(timerotacion);
+    timerotacion = parseFloat(timerotacion + dtrotacion).toFixed(5);
+    timerotacion = parseFloat(timerotacion);
     var_cuy_rotando = requestAnimationFrame(cuy_rotacionrandom);
     mixer.update(clock.getDelta());
-  //  console.log("aca "+timerotacion)
     THREE.Quaternion.slerp(q1, q2, model.quaternion, timerotacion); // added
     renderer.render(scene, camera);
     if (timerotacion > 1) {
@@ -979,7 +976,6 @@ function cuy_rotacionrandom() {//var_cuy_rotando
         modelCuyChoque.lookAt(new THREE.Vector3(b.x,b.y,b.z))
 
         CUY_ROTANDO=false;
-        // console.log("rotacion "+timerotacion);  
         timerotacion = 0; cancelAnimationFrame(var_cuy_rotando) // changed
          if (typeof var_cuy_rotando != "undefined") {
             cancelAnimationFrame(var_cuy_rotando);
@@ -1006,7 +1002,7 @@ function cuy_rotacionrandom() {//var_cuy_rotando
 /*agrega en solo en historial ahora*/
 function agregar_ganador_estadistica(nro_ganador){
     var ganador_objeto={};
-    var datos=getColor(estadistica,nro_ganador);
+    var datos = getColor(estadistica,nro_ganador);
     ganador_objeto.idEvento=EVENTO_ID;
     ganador_objeto.valor=GANADOR_DE_EVENTO;
     ganador_objeto.rgb=datos.rgb;
@@ -1212,7 +1208,8 @@ function random_tiempo(){
         if(rotarono){
             q1 = new THREE.Quaternion().copy(model.quaternion);
             model.lookAt(b.x,b.y,b.z);
-            q2 = new THREE.Quaternion().copy(model.quaternion); timerotacion = 0;
+            q2 = new THREE.Quaternion().copy(model.quaternion); 
+            timerotacion = 0;
         }
         detener_animacion();///ant
         detener_var_cuymoviendo();
@@ -1317,8 +1314,8 @@ function cuy_rotacionrapido() {//var_cuy_rotando
     model.visible = true;
     modelCuyDudando.visible = false;
     modelCuyChoque.visible = false; 
-    timerotacion=parseFloat(timerotacion+dtrotacion).toFixed(5);
-    timerotacion=parseFloat(timerotacion);
+    timerotacion = parseFloat(timerotacion + dtrotacion).toFixed(5);
+    timerotacion = parseFloat(timerotacion);
     var_cuy_rotando = requestAnimationFrame(cuy_rotacionrapido);
     mixer.update(clock.getDelta());
     THREE.Quaternion.slerp(q1, q2, model.quaternion, timerotacion); // added
