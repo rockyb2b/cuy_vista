@@ -11,7 +11,7 @@ var archivos = [
     // ,'images/glb/cuysalto.glb'
     // ,'images/glb/tablero.glb'
 ];
-dt =0.03 // velocidad movimiento cuy
+dt = 0.03 // velocidad movimiento cuy
 dtrotacion = 0.05; // velocidad rotacion cuy;
 escalacuys = 0.25;
 escalacajagirando = 1;
@@ -152,7 +152,6 @@ function cargarImagenes(srcs, callback) {
         img.src = urls[i]
     }
 }
-
 function cargar_archivos() {
     var objLoader = new THREE.GLTFLoader();
     if (index > archivos.length - 1) {
@@ -172,7 +171,32 @@ function cargar_archivos() {
         return;
     };
 
-    objLoader.load(archivos[index], function (gltf) {
+    objLoader.load(archivos[index], function (gltf) {            
+        // var model_temp = gltf.scenes[0];
+        // model_temp.traverse(function (object) {
+        //     if (object instanceof THREE.Mesh) {
+        //         object.castShadow = true
+        //     }
+        // });
+        // if (archivos[index] == "images/glb/cuycaminando.glb") {
+        //     escala_temp = escalacuys;
+        //     model_temp.name = "CUY";
+        //     model = model_temp;
+            
+           
+            
+        //     var animations = gltf.animations;
+        //     mixer = new THREE.AnimationMixer(model);
+        //     mixer.clipAction(animations[0]).play();
+        // }
+        // model.scale.set(escala_temp, escala_temp, escala_temp);
+        // model_temp.position.set(0, 0, 0);
+        // model_temp.castShadow = true;
+        // model_temp.receiveShadow = true;
+        // scene.add(model);
+        // skeleton = new THREE.SkeletonHelper(model);
+
+
         if (archivos[index] == "images/glb/cuycaminando.glb") {
             model = gltf.scenes[0];
             model.traverse(function (object) {
@@ -195,18 +219,15 @@ function cargar_archivos() {
         if (archivos[index] == "images/glb/cajagirando1.glb") {
             modelCajaP = gltf.scenes[0];
             modelCajaP.traverse(function (objectCajaGira) {
-                if (objectCajaGira instanceof THREE.Mesh) {
-                    //objectCajaGira.castShadow = true
-                }
+                objectCajaGira.castShadow = true
             });
-            modelCajaP.name="CAJA_GIRANDO";
+            modelCajaP.name = "CAJA_GIRANDO";
             modelCajaP.scale.set(escalacajagirando,escalacajagirando,escalacajagirando);
             modelCajaP.position.set(0, 0, 0);
             modelCajaP.position.y=-0.006;
 
             scene.add(modelCajaP);
             var animations = gltf.animations;
-           
             mixerCajaP = new THREE.AnimationMixer(modelCajaP);
             mixerCajaP.clipAction(animations[0]).play();
         }
@@ -585,19 +606,21 @@ function getPositionOtro(ganador,otro){
     otro.position.copy(vector_ganador);
     otro.lookAt(0,0,0);
     otro.translateZ(1);
-    posicionnueva=otro.getWorldPosition();
+    posicionnueva = otro.getWorldPosition();
     return {x:posicionnueva.x,y:0,z:posicionnueva.z}
 }
 function getPositionOtroVector(ganador,otro){
-    if(ganador=="0"){ganador="x";}
-    vector_ganador=new THREE.Vector3();
+    if( ganador == "0"){
+        ganador="x";
+    }
+    vector_ganador = new THREE.Vector3();
     getObjeto_caja(ganador).getWorldPosition(vector_ganador);
     otro.position.copy(vector_ganador);
     otro.lookAt(0,0,0);
     otro.translateZ(1);
-    posicionnueva=new THREE.Vector3();
+    posicionnueva = new THREE.Vector3();
     otro.getWorldPosition(posicionnueva);
-    vector =new THREE.Vector3(posicionnueva.x,0,posicionnueva.z);
+    vector = new THREE.Vector3(posicionnueva.x,0,posicionnueva.z);
     return vector;
 }
 function INICIO_ANIMACION_CUY_PORTADA(){
@@ -607,15 +630,15 @@ function INICIO_ANIMACION_CUY_PORTADA(){
     ocultar_cuy_cargando();
     $.LoadingOverlay("hide");
     t = 0  
-    timerotacion=0; 
+    timerotacion = 0; 
     detener_var_animarcamara();
     ocultar_cuy_esperando();
     animar_camara();
 
     mostrar_cuymoviendo();
     // camara_mirar(modelCajaP);
-    if(typeof a!="undefined"){
-        ULTIMO_PUNTO_CUY=a;
+    if(typeof a != "undefined"){
+        ULTIMO_PUNTO_CUY = a;
     }
     //reiniciar_cuy();///reiniciar posicion cuyes 0 0 0
     actualizar_cuyes_posicion();
@@ -629,8 +652,8 @@ function iniciar_animacion_cuy_portada(){
         mixerCajaP.update(clockCajaP.getDelta());
         detener_var_cajagirando();
         mostrar_cuymoviendo();
-        cajax=getObjeto_caja("x");
-        maderas=[];
+        cajax = getObjeto_caja("x");
+        maderas = [];
         maderas.push(getObjeto_caja("madera"));
         maderas.push(getObjeto_caja("madera2"));
         posicionycajaxinicial=-9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
@@ -639,8 +662,8 @@ function iniciar_animacion_cuy_portada(){
         cajax.getWorldPosition(cajax_posicioninicial);
         posicionmadera = new THREE.Vector3() ; 
         getObjeto_caja("madera").getWorldPosition(posicionmadera);
-        dtcajax=0.2;
-        tcajax=0;
+        dtcajax = 0.2;
+        tcajax = 0;
         rotacionx_inicio=0;//-7.318557638911297e-33;
         rotacionx_fin=-Math.PI / 2;//-1.4;
         q1_cajax = new THREE.Quaternion().copy(cajax.quaternion);
@@ -770,7 +793,7 @@ function cajax_animacion(){
     maderas[0].visible=false;
     maderas[1].visible=false;
 
-    funcion_ease=EasingFunctions_array[2].funcion;//easeOutQuad
+    funcion_ease = EasingFunctions_array[2].funcion;//easeOutQuad
     // var newZ = lerp(posicionxcajaxinicial, bcajaxz, funcion_ease(tcajax));  
     var newY = lerp(posicionycajaxinicial, posicionfinalcaja, funcion_ease(tcajax));  
     var newrotacionX = lerp(rotacionx_inicio, rotacionx_fin, funcion_ease(tcajax));  
@@ -778,14 +801,14 @@ function cajax_animacion(){
     cajax.position.y=newY;
     cajax.rotation.x=newrotacionX;
     //t += dt;
-    tcajax=parseFloat(tcajax+dtcajax).toFixed(5);
-    tcajax=parseFloat(tcajax);
+    tcajax = parseFloat(tcajax + dtcajax).toFixed(5);
+    tcajax = parseFloat(tcajax);
     var_animar_cajax = requestAnimationFrame(cajax_animacion);
-    if(tcajax>1){
-        detener_var_animar_cajax();tcajax=0;
+    if(tcajax > 1){
+        detener_var_animar_cajax();
+        tcajax=0;
     }
 }
-
 function random_posicion(min, max) {
     return ((Math.random() * (max - min)) + min).toFixed(2);
 }
@@ -897,7 +920,7 @@ function correr_spline(){
 
 function correr_spline_portada(){
     if(ANIMACION_CUY){
-         t=1;
+        t = 1;
         detener_var_correr_spline_portada();
     }
     model.visible=true;
@@ -911,23 +934,25 @@ function correr_spline_portada(){
     axis.crossVectors(up, tangent).normalize();
     radians = Math.acos( up.dot( tangent ) );
     model.quaternion.setFromAxisAngle( axis, radians );
-    t=t+dtSPLINE;
-    if(t>=1){
+    t = t + dtSPLINE;
+    if(t >= 1){
         // model.position.copy(posicion_fin_caja);
-         t=0;
+         t = 0;
          cancelAnimationFrame(var_correr_spline_portada) ;
             // console.info("FIN SPLINE");
         CUY_CORRIENDO = false;
-        model.visible=true;
-        if(!ANIMACION_CUY){
-            inicio={x:model.position.x,
+        model.visible = true;
+        if(!ANIMACION_CUY)
+        {
+            inicio = 
+                {
+                    x:model.position.x,
                     y:model.position.y,
-                    z:model.position.z};
+                    z:model.position.z
+                };
             spline = new THREE.CatmullRomCurve3(puntos_azar_inicio(inicio));
             correr_spline_portada();
         }
-
-
         fin_tiempof = performance.now();
         milisegundosf = (fin_tiempof - inicio_tiempo);
         console.info("TIEMPO FINAL spLine=> segundos: " +parseFloat(milisegundosf/1000).toFixed(2)+" ,  milliseconds : "+ milisegundosf );
@@ -1016,7 +1041,7 @@ function callback_ganador(){
                 setTimeout(function () {
                     ocultar_div_ganador();
                     t = 0;
-                    ANIMACION_CUY=false;
+                    ANIMACION_CUY = false;
                     //iniciar_websocketservidor();
                     ANIMACION_CUY_PORTADA = false;
                     INICIO_ANIMACION_CUY_PORTADA();
@@ -1075,23 +1100,23 @@ function mover_cuyrandom() {    ///var_cuymoviendo  => animationframe
         if (milisegundos > TIEMPO_RANDOM) {////tiempo de animacion cuy paso, ir a caja ganador posicion
             if(!mover_a_ganador){
                     mover_a_ganador=true;
-                    // b=get_caja(GANADOR_DE_EVENTO).posicion;
-                    if(GANADOR_DE_EVENTO=="x" || GANADOR_DE_EVENTO=="0"){
-                        bfuncion_easing_indice=7;//easeInQuart
+                    // b = get_caja(GANADOR_DE_EVENTO).posicion;
+                    if(GANADOR_DE_EVENTO == "x" || GANADOR_DE_EVENTO == "0"){
+                        bfuncion_easing_indice = 7;//easeInQuart
                         console.log("X o O");
-                        b=new THREE.Vector3();
+                        b = new THREE.Vector3();
                         getObjeto_caja("madera").getWorldPosition(b);
                         random_tiempo();
                     }else{
-                        posicion_fin_caja= new THREE.Vector3();
+                        posicion_fin_caja = new THREE.Vector3();
                         getObjeto_caja(GANADOR_DE_EVENTO).getWorldPosition(posicion_fin_caja);
                         posicion_fin_caja.y=0;
                         CUY_CORRIENDO = false;
                         puntosspline=[];
-                        posicionmodel=new THREE.Vector3();
+                        posicionmodel = new THREE.Vector3();
                         model.getWorldPosition(posicionmodel);
 
-                        puntootro.y=0;
+                        puntootro.y = 0;
                         puntosspline.push(posicionmodel);
                         puntosspline.push(puntootro);
                         puntosspline.push(posicion_fin_caja);
@@ -1271,12 +1296,6 @@ function cuypremio(){
 ///////////FINNNNNNNNNNNNNNNNNNNNNNNNN            FUNCIONES nuevas
 
 
-
-
-
-
-
-
 function dibujarCurva() {
   var vertices = path.getSpacedPoints(20);
   // Change 2D points to 3D points
@@ -1335,8 +1354,6 @@ function cuy_rotacionrapido() {//var_cuy_rotando
     }
 }
 
-
-
 function mover_cuy_rapido() {    ///var_cuymoviendo  => animationframe
     if (!CUY_CORRIENDO) {  return;}
     mostrar_cuymoviendo();
@@ -1358,26 +1375,28 @@ function mover_cuy_rapido() {    ///var_cuymoviendo  => animationframe
         detener_var_cuymoviendo();
         detener_var_cuy_rotando();
         actualizar_cuyes_posicion();
-            if(!mover_a_ganador){
-                    mover_a_ganador=true;
-                    // b=get_caja(GANADOR_DE_EVENTO).posicion;
-                    if(GANADOR_DE_EVENTO=="x"){
-                             b=new THREE.Vector3();
-                         getObjeto_caja("madera").getWorldPosition(b);
-                    }else{
-                        b=get_caja(GANADOR_DE_EVENTO).posicion;
-                    }
-            }  
-            else {
-                CUY_CORRIENDO = false;
-                var posicionmadera= getObjeto_caja("madera").getWorldPosition(posicionmadera);    
-                if(model.position.x== posicionmadera.x && model.position.z== posicionmadera.z){
-  
-                    modelCuyChoque.position.y=-0.1;
-                    cuychoque();
-                    cajax_animacion();
+        if(!mover_a_ganador){
+                mover_a_ganador=true;
+                // b=get_caja(GANADOR_DE_EVENTO).posicion;
+                if(GANADOR_DE_EVENTO == "x"){
+                    b = new THREE.Vector3();
+                    getObjeto_caja("madera").getWorldPosition(b);
                 }
-             }
+                else
+                {                        
+                    b = get_caja(GANADOR_DE_EVENTO).posicion;
+                }
+        }  
+        else {
+            CUY_CORRIENDO = false;
+            var posicionmadera = getObjeto_caja("madera").getWorldPosition(posicionmadera);    
+            if(model.position.x == posicionmadera.x && model.position.z == posicionmadera.z){
+
+                modelCuyChoque.position.y = -0.1;
+                cuychoque();
+                cajax_animacion();
+            }
+            }
     }  ///fin t>1
 }
 
@@ -1407,7 +1426,6 @@ function randomPosicion(min, max) {
     const numeroDecimal = parseFloat(numero.toFixed(2));
     return numeroDecimal;
 }
-
 // Example usage:
 const result = generarPosicionesRandom();
 console.log(result);

@@ -1,38 +1,35 @@
+// import { Archivos } from './cuy_clases/archivos_class.js';
+
 $.LoadingOverlay("show");
 $(".loadingoverlay").append($('<div id="cargador_overlay" style="font-family:Arial;position: relative; left: 8%;width:7%;height: 10%; text-align:center;font-size:8vh;color:black">--</div>'))
 $(".loadingoverlay").css("background-color","rgba(255, 255, 255, 0.3)");
 
 $("#DIV_EVENTOESPERANDO").hide();
 $("#DIV_TITULOEVENTO").hide();
-IPSERVIDOR_WEBSOCKETS=$("#IPSERVIDOR_WEBSOCKETS").val();
-PUERTO_WEBSOCKETS=$("#PUERTO_WEBSOCKETS").val();
-TIMEOUT_CONEXIONWEBSOCKETS_CORTAR=5000;
-CONTROLES = false;
+const IPSERVIDOR_WEBSOCKETS = "1";//$("#IPSERVIDOR_WEBSOCKETS").val();
+const PUERTO_WEBSOCKETS=$("#PUERTO_WEBSOCKETS").val();
+const TIMEOUT_CONEXIONWEBSOCKETS_CORTAR = 5000;
+const CONTROLES = false;
 
-GANADOR_DE_EVENTO="";
-EVENTO_ID="";
-
+var  GANADOR_DE_EVENTO = "";
+var  EVENTO_ID = "";
 
 var VENTANA_ACTIVA = true;
-EVENTO_YA_PASO=false;
+var EVENTO_YA_PASO = false;
 window.addEventListener('blur', function() {
    //not running full
-   VENTANA_ACTIVA=false;
+   VENTANA_ACTIVA = false;
    console.log("VENTANA_ACTIVA FALSE" );
-
    // if(EVENTO_YA_PASO){
    //      window.reload();
    // }
 }, false);
 
 window.addEventListener('focus', function() {
-   //running optimal (if used)
-    VENTANA_ACTIVA=true;
-   console.log("VENTANA_ACTIVA TRUE" )
+    VENTANA_ACTIVA = true;
+    console.log("VENTANA_ACTIVA TRUE" )
 
 }, false);
-
-
 
 $(document).ready(function () {
     // bloquear_teclas_mouse();
@@ -42,8 +39,10 @@ $(document).ready(function () {
 if (WEBGL.isWebGLAvailable() === false) {
     document.body.appendChild(WEBGL.getWebGLErrorMessage());
 }
-var scene, renderer, camera, stats;
-var model, 
+var TIEMPO_RENDER,
+cajax;
+var scene , renderer, camera, stats;
+var model ,
     modelCajaP,
     modelCuyDudando,
     modelChoque,
@@ -59,18 +58,9 @@ var model,
     clockCuyPremio,
     clockCuyEsperando,
     clockCuySalto;
-var CAJAS_ARRAY = [];
-var crossFadeControls = [];
-var idleAction, walkAction, runAction;
-var idleWeight, walkWeight, runWeight;
-var actions, settings;
-var singleStepMode = false;
-var sizeOfNextStep = 0;
-var loaded = false;
+var CAJAS_ARRAY = [];//array cajas numbered
 var i = 0;
-var controls;
-var posicionZ = 0;
-
+var controls;//THREE.OrbitControls
 
 function getObjeto_caja(nombrebuscar){
     arraycajas = modelCaja.children[0].children[0].children[0].children;
@@ -100,6 +90,7 @@ return maderas;
 }
 
 function INICIAR_RENDER() {
+    var container = document.getElementById('DIV_CANVAS');
     clock = new THREE.Clock();
     clockCuyDudando = new THREE.Clock();
     clockCajaP = new THREE.Clock();
@@ -107,7 +98,6 @@ function INICIAR_RENDER() {
     clockCuyPremio = new THREE.Clock();
     clockCuyEsperando = new THREE.Clock();
     clockCuySalto= new THREE.Clock();
-    var container = document.getElementById('DIV_CANVAS');
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 100);
     camera.position.set(0, 10, 0);
     // //controls
@@ -126,7 +116,7 @@ function INICIAR_RENDER() {
     var dirLight = new THREE.DirectionalLight(0xffffff);
     dirLight.position.set(-3, 20, -15);
     dirLight.castShadow = true;
-    camerashadow=5;
+    var camerashadow = 5;
     dirLight.shadow.camera.top = camerashadow;
     dirLight.shadow.camera.bottom = -camerashadow;
     dirLight.shadow.camera.left = -camerashadow;
@@ -179,13 +169,36 @@ function INICIAR_RENDER() {
         var escalatablerox = 0.55;
         var tablero = modelCaja.children[0].children[0].children[1];
         tablero.scale.set(escalatablerox,escalatablero,escalatablero);/// suelo 
-
         var suelo = modelCaja.children[0].children[0].children[0];
 
         modelCaja.name ="TABLA_CAJAS";
         scene.add(modelCaja);
+        // const options = {
+        //     archivos: [
+        //             'images/glb/cuycaminando.glb',
+        //             'images/glb/cajagirando1.glb',
+        //             'images/glb/cuycabezagirando.glb',
+        //             'images/glb/cuyestrellas.glb'
+        //         ],
+        //     callback : function(){
+        //         otro = model.clone();
+        //         this.cuy.TIEMPO_FIN_RENDER = performance.now() - this.cuy.TIEMPO_RENDER;
+        //         this.cuy.TIEMPO_FIN_RENDER = (this.cuy.TIEMPO_FIN_RENDER/1000).toFixed(2);
+        //         console.warn("FIN CARGA ARCHIVOS en " + this.cuy.TIEMPO_FIN_RENDER + " seg");
+        //         $("#JUEGO").show();
+        //         if (ANIMACION_CUY_PORTADA == false) {
+        //             INICIO_ANIMACION_CUY_PORTADA(); /*CUY PORTADA*/ ;
+        //         }
+        //         //iniciar_websocketservidor();
+        //         window.addEventListener('resize', responsive_canvas, false);
+        //         return;
+        //     }
+        //     // cuy: cuyInstance
+        // };
+        // var archivos_cargar = new Archivos(options);
+        // archivos_cargar.cargarArchivos();
         cargar_archivos(); ///////////////////////
-        modelCaja.children[0].children[0].children[1].receiveShadow=true;
+        modelCaja.children[0].children[0].children[1].receiveShadow = true;
         CAJAS_ARRAY = modelCaja.children[0].children[0].children[0].children;
         cajax = modelCaja.children[0].children[0].children[2];
     } ,progreso_descarga);
@@ -193,8 +206,8 @@ function INICIAR_RENDER() {
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    var ww=window.innerWidth;//*0.6;
-    var hh=window.innerHeight;//*0.6;
+    var ww = window.innerWidth;//*0.6;
+    var hh = window.innerHeight;//*0.6;
     renderer.setSize(ww, hh);
     renderer.gammaOutput = true;
     renderer.gammaFactor = 2;
@@ -202,7 +215,7 @@ function INICIAR_RENDER() {
     container.appendChild(renderer.domElement);
 }
 
-CONSULTADO_EVENTO = false;
+var CONSULTADO_EVENTO = false;
 function CargarEstadistica(IdJuego) {    
     var url = document.location.origin + "/" + "api/DataEventoResultadoEventoFk";
     $.ajax({
@@ -372,7 +385,6 @@ function iniciar_websocketservidor(){
 
         }
 }
-
 
 function calcular_estadisticas(array_estadisticas){
     var estadistica=array_estadisticas;

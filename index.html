@@ -26,7 +26,7 @@
 </head>
 
 <body >
-	<input type="hidden" id="IPSERVIDOR_WEBSOCKETS" value="{{env('IPSERVIDOR_WEBSOCKETS','35.184.46.33')}}">
+	<input type="hidden" id="IPSERVIDOR_WEBSOCKETS" value="">
 	<input type="hidden" id="PUERTO_WEBSOCKETS" value="{{env('PUERTO_WEBSOCKETS','888')}}">
 	<div  class="cuy_cargando" id="DIV_CARGANDO"></div>
 
@@ -287,7 +287,8 @@
 <!-- 	<script src="{{asset('../assets/js/FBXloader.js')}}"></script>
 <script src="{{asset('../assets/js/Inflate.min.js')}}"></script> -->
 <script src="public/assets/js/animacion_cuy/Funciones_Easing.js"></script>
-<script src="public/assets/js/animacion_cuy/animacion.js"></script>
+<script type="module" src="public/assets/js/animacion_cuy/cuy_clases/archivos_class.js"></script>
+<script  src="public/assets/js/animacion_cuy/animacion.js"></script>
 <script src="public/assets/js/animacion_cuy/animacion_cuy.js"></script>
 <!-- <script src="public/assets/js/animacion_cuy/animacion_ganador.js')}}"></pt> -->
 

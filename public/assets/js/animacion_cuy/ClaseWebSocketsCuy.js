@@ -278,7 +278,7 @@ function accion_evento(DATOS) {
         // // INTERVAL_fin_evento=setInterval(function(){
         // //     tiempo_fin_evento--;
         // //     if(tiempo_fin_evento<=0){
-        // //         EVENTO_YA_PASO=true;
+        // //         EVENTO_YA_PASO = true;
         // //         clearInterval(INTERVAL_fin_evento);
         // //     }
         // // },1000);
