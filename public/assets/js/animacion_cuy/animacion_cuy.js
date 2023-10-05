@@ -1194,7 +1194,6 @@ function iniciar_tiempo_random(tiempo) {
         generar_nueva_posicion_random();
         random_tiempo();
     },3500);
-
 }
 function random_tiempo(){
     if (typeof var_cuymoviendo === "undefined") {

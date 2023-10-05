@@ -217,9 +217,7 @@ function logwarn(msg) {
 function logerror(msg) {
     console.error(msg);
 }
-
 //function onkey(event){ if(event.keyCode==13){ send(); } }
-
 //////////////////////////////////////////NUEVO ULTIMO///////////////////////////////////////////////////////////
 
 function accion_evento(DATOS) {

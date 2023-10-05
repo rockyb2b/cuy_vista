@@ -69,7 +69,7 @@
 	    // Plano y Cajas
 	    var loaderCaja = new THREE.GLTFLoader();
 
-	    var TIEMPO_RENDER=performance.now();
+	    var TIEMPO_RENDER = performance.now();
 	    loaderCaja.load('images/glb/tablerograss.glb', function (gltfCaja) {
 	        modelCaja = gltfCaja.scenes[0];
 	        modelCaja.traverse(function (object) {

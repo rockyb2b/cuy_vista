@@ -164,7 +164,7 @@ class Archivos {
             }
             this.index++;
             this.cargarArchivos();
-        }, this.progresoDescarga);
+        }, this.progresoDescarga.bind(this));
     }
     progresoDescarga(xhr) {
         if ( xhr.lengthComputable ) {
