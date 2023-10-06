@@ -136,7 +136,7 @@ class Cuy {
         this.bfuncion_easing_indice;
 
         this.posicionmodel;
-
+        this.radians;
         ///activar CUY
         this.TIEMPO_GIRO_CAJA = 3000;
         this.TIEMPO_ESPERA_CASAGANADOR = 1000; ///tiempo espera luego q cuy entra en casa
@@ -1061,8 +1061,8 @@ class Cuy {
         var tangent = this.spline.getTangent( this.t ).normalize();
         this.mixer.update(this.clock.getDelta())
         this.axis.crossVectors(this.up, tangent).normalize();
-        var radians = Math.acos( this.up.dot( tangent ) );
-        this.model.quaternion.setFromAxisAngle( this.axis, radians );
+        this.radians = Math.acos( this.up.dot( tangent ) );
+        this.model.quaternion.setFromAxisAngle( this.axis, this.radians );
         this.t = this.t + this.dtSPLINE;
         if(this.t >= 1){
             this.model.position.copy(this.posicion_fin_caja);
