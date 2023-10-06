@@ -16,15 +16,15 @@ if (WEBGL.isWebGLAvailable() === false) {
 class Cuy {
     constructor(options) {
         this.TIEMPO_CARGA_ARCHIVOS ;/// fin tiempo CARGA de archivos
-
+        this.container ;
         this.scene ;
         this.cajax;
         this.renderer;
         this.camera;
         this.stat;
 
-        this.model ;
-        this.modelCajaP;
+        this.model ;//CUY CAMINANDO
+        this.modelCajaGirando;
         this.modelCuyDudando;
         this.modelChoque;
         this.modelCaja;
@@ -36,15 +36,15 @@ class Cuy {
 
         this.mixer;
         this.mixerCaja ;
+        this.mixerCajaGirando ;
         this.mixerCuyDudando ;
-        this.mixerCajaP ;
         this.mixerCuyPremio ;
         this.mixerCuyEsperando ;
         this.mixerCuySalto;
 
         this.clock;
+        this.clockCajaGirando;
         this.clockCuyDudando;
-        this.clockCajaP;
         this.clockCuyChoque;
         this.clockCuyPremio;
         this.clockCuyEsperando;
@@ -89,21 +89,22 @@ class Cuy {
         this.a;
         this.ULTIMO_PUNTO_CUY;
 
-        this.posicionycajaxinicial;
-        this.posicionfinalcaja;
+        // this.posicionycajaxinicial;
+        // this.posicionfinalcaja;
 
         this.t;
+        this.t_portada;
         this.timerotacion;
 
-        this.cajax_posicioninicial;
+        // this.cajax_posicioninicial;
         this.posicionmadera;
 
-        this.dtcajax;
-        this.tcajax ;
-        this.rotacionx_inicio;
-        this.rotacionx_fin;
-        this.q1_cajax ;
-        this.q2_cajax ;
+        this.dtcajax = 0.2;
+        this.tcajax = 0;
+        this.rotacionx_inicio = 0;
+        this.rotacionx_fin = -Math.PI / 2;
+        // this.q1_cajax ;
+        // this.q2_cajax ;
 
         this.inicio;
         this.inicio_tiempo;
@@ -117,7 +118,7 @@ class Cuy {
         this.up = new THREE.Vector3(0,0,1 );
         this.axis = new THREE.Vector3( );
 
-        this.iniciogiro;
+        this.camara_iniciogiro;
 
         this.mover_a_ganador;
         
@@ -135,7 +136,6 @@ class Cuy {
         this.bfuncion_easing_indice;
 
         this.posicionmodel;
-
 
         ///activar CUY
         this.TIEMPO_GIRO_CAJA = 3000;
@@ -178,7 +178,7 @@ class Cuy {
                     height: "0%"
                 }, (seg_barra_loading) * 1000, function() {
                     setTimeout(()=>{
-                        if(typeof $("#termotetro_para_iniciar").data("illuminate")!="undefined"){
+                        if(typeof $("#termotetro_para_iniciar").data("illuminate") != "undefined"){
                             $("#termotetro_para_iniciar").data("illuminate").destruir();
                         }
                         self.callback_animacion(id_evento);
@@ -216,6 +216,17 @@ class Cuy {
             } ///else segundos_para_fin_evento >0
       } //fin else
     } ///fin accion cuy2
+    callback_animacion(EVENTO_ID){
+        this.detener_var_correr_spline_portada();
+        this.ocultar_termometro_contador();
+        this.ocultar_div_eventoesperando(
+                ()=>{
+                    this.actualizar_evento_titulo(EVENTO_ID);
+                    this.buscando_evento = false;
+                    this.INICIO_ANIMACION_CUY(); ////////////////////////////////////////
+                }
+            );
+    }
 
     actualizar_contador_texto_latido(tiempo_en_segundos,texto){
         $("#contador_para_activar").text(texto + " " + tiempo_en_segundos +" seg.");
@@ -243,18 +254,6 @@ class Cuy {
             conta = parseInt(conta) - 1;
         }, 1000);
     }
-    callback_animacion(EVENTO_ID){
-        this.detener_var_correr_spline_portada();
-        this.ocultar_termometro_contador();
-        this.ocultar_div_eventoesperando(
-                ()=>{
-                    this.actualizar_evento_titulo(EVENTO_ID);
-                    this.buscando_evento = false;
-                    this.INICIO_ANIMACION_CUY(); ////////////////////////////////////////
-                }
-            );
-    }
-
     ocultar_termometro_contador(){
         $("#barra_loading_tpi").stop().stop();
         if(typeof this.conteo_ != "undefined"){
@@ -273,16 +272,17 @@ class Cuy {
     INICIO_ANIMACION_CUY(){
         this.mixer.update(this.clock.getDelta());
         this.mixerCuyDudando.update(this.clockCuyDudando.getDelta());
-        this.mixerCajaP.update(this.clockCajaP.getDelta());
+        this.mixerCajaGirando.update(this.clockCajaGirando.getDelta());
         this.ANIMACION_CUY = true;
         // iniciogiro =  clockCajaP.getElapsedTime();
         this.t = 0   /// tiempo movimiento cuy;
+        this.t_portada = 0;
         this.timerotacion = 0; 
-        this.detener_var_animarcamara();
         this.ocultar_cuy_esperando();
+        this.detener_var_animarcamara();
         this.animar_camara();
     
-        var objeto = this.modelCajaP;    
+        var objeto = this.modelCajaGirando;    
         const X = objeto.position.x ;
         const Y = objeto.position.y + 1.6;
         const Z = objeto.position.z + 5.5;
@@ -296,8 +296,8 @@ class Cuy {
             this.camera,
             2000,
             () => {
-                this.iniciogiro =  performance.now();
-                this.camara_mirar(this.modelCajaP);
+                this.camara_iniciogiro =  performance.now();
+                this.camara_mirar(this.modelCajaGirando);
                 if(typeof this.a != "undefined"){
                     this.ULTIMO_PUNTO_CUY = this.a;
                 }
@@ -306,7 +306,7 @@ class Cuy {
                 if(typeof this.controls != "undefined"){
                 }
                 this.detener_var_cajagirando();
-                this.modelCajaP.visible = true;
+                this.modelCajaGirando.visible = true;
                 this.cajagirando_animacion();
             }
         );
@@ -370,7 +370,7 @@ class Cuy {
         $(arraycajas).each(function(i,e){
             var nombre = e.name;///1.png
             if(nombre == nombrebuscar){
-                objetoretornar= e;
+                objetoretornar = e;
                 return false;
             }
         })
@@ -398,10 +398,10 @@ class Cuy {
     }
     INICIAR_RENDER() {
         this.pantalla_loader();
-        var container = document.getElementById('DIV_CANVAS');
+        this.container = document.getElementById('DIV_CANVAS');
         this.clock = new THREE.Clock();
         this.clockCuyDudando = new THREE.Clock();
-        this.clockCajaP = new THREE.Clock();
+        this.clockCajaGirando = new THREE.Clock();
         this.clockCuyChoque = new THREE.Clock();
         this.clockCuyPremio = new THREE.Clock();
         this.clockCuyEsperando = new THREE.Clock();
@@ -421,10 +421,11 @@ class Cuy {
         var hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
         hemiLight.position.set(0, 20, 0);
         this.scene.add(hemiLight);
+
+        var camerashadow = 5;
         var dirLight = new THREE.DirectionalLight(0xffffff);
         dirLight.position.set(-3, 20, -15);
         dirLight.castShadow = true;
-        var camerashadow = 5;
         dirLight.shadow.camera.top = camerashadow;
         dirLight.shadow.camera.bottom = -camerashadow;
         dirLight.shadow.camera.left = -camerashadow;
@@ -454,7 +455,6 @@ class Cuy {
             fragmentShader: fragmentShader,
             side: THREE.BackSide
         } );
-    
         var sky = new THREE.Mesh( skyGeo, skyMat );
         this.scene.add( sky );
     
@@ -463,7 +463,7 @@ class Cuy {
         this.CAJAS_ARRAY = [];
         const tiempo_inicio_archivos = performance.now();
         
-        const $this = this;
+        const $this = this;//$this =>  clase
         
         var loaderCaja = new THREE.GLTFLoader();
         loaderCaja.load('images/glb/tablerograss_blanco.glb', function(gltfCaja) {
@@ -510,7 +510,6 @@ class Cuy {
             $this.Archivos = archivos_cargar;
             $this.Archivos.cargarArchivos();
 
-            // this.cargar_archivos(); ///////////////////////
             $this.modelCaja.children[0].children[0].children[1].receiveShadow = true;
             $this.CAJAS_ARRAY = $this.modelCaja.children[0].children[0].children[0].children;
             $this.cajax = $this.modelCaja.children[0].children[0].children[2];
@@ -525,7 +524,7 @@ class Cuy {
         this.renderer.gammaOutput = true;
         this.renderer.gammaFactor = 2;
         this.renderer.shadowMap.enabled = true;
-        container.appendChild(this.renderer.domElement);
+        this.container.appendChild(this.renderer.domElement);
     }
     INICIO_ANIMACION_CUY_PORTADA(){
         this.ANIMACION_CUY_PORTADA = true;
@@ -533,14 +532,15 @@ class Cuy {
     
         this.ocultar_cuy_cargando();
         $.LoadingOverlay("hide");
-        this.t = 0;  
+        this.t = 0;
+        this.t_portada = 0;
         this.timerotacion = 0; 
         this.detener_var_animarcamara();
         this.ocultar_cuy_esperando();
         this.animar_camara(this);
     
         this.mostrar_cuymoviendo();
-        // camara_mirar(modelCajaP);
+        // camara_mirar(modelCajaGirando);
         if(typeof this.a != "undefined"){
             this.ULTIMO_PUNTO_CUY = this.a;
         }
@@ -549,6 +549,50 @@ class Cuy {
         
         this.detener_var_cajagirando();
         this.iniciar_animacion_cuy_portada();
+    }
+
+    iniciar_animacion_cuy_portada(){//cuy movement en portada 
+        this.mostrar_cuymoviendo();
+
+        this.mixer.update(this.clock.getDelta());
+        this.mixerCuyDudando.update(this.clockCuyDudando.getDelta());
+        this.mixerCajaGirando.update(this.clockCajaGirando.getDelta());
+
+        this.cajax = this.getObjeto_caja("x");
+
+        this.maderas = [];
+        this.maderas.push(this.getObjeto_caja("madera"));
+        this.maderas.push(this.getObjeto_caja("madera2"));
+        // this.posicionycajaxinicial = -9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
+        // this.posicionfinalcaja = -11.4;//8.2;//3.4999993133545217//800;
+        // this.cajax_posicioninicial = new THREE.Vector3() ; 
+        // this.cajax.getWorldPosition(this.cajax_posicioninicial);
+        this.posicionmadera = new THREE.Vector3() ; 
+        this.getObjeto_caja("madera").getWorldPosition(this.posicionmadera);
+
+        // this.dtcajax = 0.2;
+        // this.tcajax = 0;
+        // this.rotacionx_inicio = 0;//-7.318557638911297e-33;
+        // this.rotacionx_fin = -Math.PI / 2;//-1.4;
+        // this.q1_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
+        // this.q2_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
+        this.timerotacion = 0;
+        if(typeof this.controls != "undefined"){
+            this.controls.autoRotate = false;
+        }
+        this.inicio_tiempo = performance.now();
+        this.inicio = 
+        {
+            x : this.model.position.x,
+            y : this.model.position.y,
+            z : this.model.position.z
+        };
+        this.spline = new THREE.CatmullRomCurve3(this.puntos_azar_inicio(this.inicio));
+        this.dtSPLINE = 0.0015;
+        // this.correr_spline_portada(this.inicio);
+        this.correr_spline_portada();
+        // camara_movimiento_inicio({x:0,y:10.3,z:0},camera,2500);
+        // iniciar_cuy(GANADOR_DE_EVENTO,TIEMPO_CUY);
     }
     progreso_descarga = function( xhr ) {
         if ( xhr.lengthComputable ) {
@@ -593,8 +637,9 @@ class Cuy {
         $("#DIV_ESPERA").addClass("SIN_ANIMACION").hide();
     }
     mostrar_cuymoviendo(){
-        this.model.visible = true; 
-        this.modelCajaP.visible = false;
+        this.model.visible = true;
+
+        this.modelCajaGirando.visible = false;
         this.modelCuyDudando.visible = false;       
         this.modelCuyChoque.visible = false;
     }
@@ -602,6 +647,7 @@ class Cuy {
         this.modelCuyDudando.position.x = this.model.position.x;
         this.modelCuyDudando.position.y = this.model.position.y;
         this.modelCuyDudando.position.z = this.model.position.z;
+
         this.modelCuyChoque.position.x = this.model.position.x;
         this.modelCuyChoque.position.y = this.model.position.y;
         this.modelCuyChoque.position.z = this.model.position.z;
@@ -612,48 +658,10 @@ class Cuy {
              delete this.var_cajagirando;
         }
     }
-    iniciar_animacion_cuy_portada(){
-        this.mixer.update(this.clock.getDelta());
-        this.mixerCuyDudando.update(this.clockCuyDudando.getDelta());
-        this.mixerCajaP.update(this.clockCajaP.getDelta());
-        this.detener_var_cajagirando();
-        this.mostrar_cuymoviendo();
-        this.cajax = this.getObjeto_caja("x");
-        this.maderas = [];
-        this.maderas.push(this.getObjeto_caja("madera"));
-        this.maderas.push(this.getObjeto_caja("madera2"));
-        this.posicionycajaxinicial = -9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
-        this.posicionfinalcaja = -11.4;//8.2;//3.4999993133545217//800;
-        this.cajax_posicioninicial = new THREE.Vector3() ; 
-        this.cajax.getWorldPosition(this.cajax_posicioninicial);
-        this.posicionmadera = new THREE.Vector3() ; 
-        this.getObjeto_caja("madera").getWorldPosition(this.posicionmadera);
-        this.dtcajax = 0.2;
-        this.tcajax = 0;
-        this.rotacionx_inicio = 0;//-7.318557638911297e-33;
-        this.rotacionx_fin = -Math.PI / 2;//-1.4;
-        this.q1_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
-        this.q2_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
-        this.timerotacion = 0;
-        if(typeof this.controls != "undefined"){
-            this.controls.autoRotate = false;
-        }
-        this.inicio_tiempo = performance.now();
-        this.inicio = 
-        {
-            x : this.model.position.x,
-            y : this.model.position.y,
-            z : this.model.position.z
-        };
-        this.spline = new THREE.CatmullRomCurve3(this.puntos_azar_inicio(this.inicio));
-        this.dtSPLINE = 0.0015;
-        this.correr_spline_portada(this.inicio);
-        // camara_movimiento_inicio({x:0,y:10.3,z:0},camera,2500);
-        // iniciar_cuy(GANADOR_DE_EVENTO,TIEMPO_CUY);
-    }
+    
     correr_spline_portada(){
         if(this.ANIMACION_CUY){
-            this.t = 1;
+            this.t_portada = 1;
             this.detener_var_correr_spline_portada();
         }
         this.model.visible = true;
@@ -661,17 +669,17 @@ class Cuy {
         this.var_correr_spline_portada = requestAnimationFrame(this.correr_spline_portada.bind(this));// Keep the context of 'this'
         
         var tangent;
-        var pt = this.spline.getPoint( this.t );
+        var pt = this.spline.getPoint( this.t_portada );
         this.model.position.set( pt.x, pt.y, pt.z );
-        tangent = this.spline.getTangent( this.t ).normalize();
+        tangent = this.spline.getTangent( this.t_portada ).normalize();
         this.mixer.update(this.clock.getDelta())
         this.axis.crossVectors(this.up, tangent).normalize();
         var radians = Math.acos( this.up.dot( tangent ) );
         this.model.quaternion.setFromAxisAngle( this.axis, radians );
-        this.t = this.t + this.dtSPLINE;
-        if(this.t >= 1){
+        this.t_portada = this.t_portada + this.dtSPLINE;
+        if(this.t_portada >= 1){
             // model.position.copy(posicion_fin_caja);
-            this.t = 0;
+            this.t_portada = 0;
             cancelAnimationFrame(this.var_correr_spline_portada) ;
                 // console.info("FIN SPLINE");
             this.CUY_CORRIENDO = false;
@@ -720,7 +728,7 @@ class Cuy {
         })
             .start();
     }
-    camara_movimiento_girando(hacia,camera,tiempo, callback){
+    camara_movimiento_girando(hacia,camera,tiempo, callback){/*animation camara hasta inicio d giro */
         var from = {
             x: camera.position.x,
             y: camera.position.y,
@@ -735,9 +743,9 @@ class Cuy {
             .to(to, tiempo)
             .easing(TWEEN.Easing.Linear.None)
             .onUpdate(function () {
-            camera.position.set(this.x, this.y, this.z);
-            camera.lookAt(new THREE.Vector3(0, 0, 0));
-        })
+                camera.position.set(this.x, this.y, this.z);
+                camera.lookAt(new THREE.Vector3(0, 0, 0));
+            })
             .onStart(function(){
                 //  camera.position.x=to.x;camera.position.z=to.z;camera.position.y=to.y
             })
@@ -749,37 +757,39 @@ class Cuy {
     camara_mirar(objeto){
         this.camera.position.x = objeto.position.x ;
         this.camera.position.y = objeto.position.y + 1.6;
-        this.camera.position.z = objeto.position.z +5.5;
+        this.camera.position.z = objeto.position.z + 5.5;
         this.camera.lookAt(objeto.position);
     }
     reiniciar_cuy(){
         this.model.position.set(0,0,0);
+        this.modelCuyDudando.position.set(0,0,0);
+        this.modelCuyChoque.position.set(0,0,0);
+
         this.a = {
             x : this.model.position.x,
             y : this.model.position.y,
             z : this.model.position.z
-        }    
-        this.modelCuyDudando.position.set(0,0,0);
-        this.modelCuyChoque.position.set(0,0,0);
+        }
+
         this.clock = new THREE.Clock();
         this.clockCuyDudando = new THREE.Clock();
-        this.clockCuyChoque= new THREE.Clock();
-        this.clockCajaP= new THREE.Clock();
+        this.clockCuyChoque = new THREE.Clock();
+        this.clockCajaGirando = new THREE.Clock();
         this.t = 0;
         $("#barra_loading_tpi").css("height","100%");
         // $("#barra_loading_tpi").css("width","0%");
-        //PUNTOS_CUY=null;
-        //INDICE_PUNTOS_CUY=0;
+        //PUNTOS_CUY = null;
+        //INDICE_PUNTOS_CUY = 0;
     }
     cajagirando_animacion() {
         this.var_cajagirando = requestAnimationFrame(this.cajagirando_animacion.bind(this));
 
         this.mixer.update(this.clock.getDelta());
         this.mixerCuyDudando.update(this.clockCuyDudando.getDelta());
-        this.mixerCajaP.update(this.clockCajaP.getDelta());
+        this.mixerCajaGirando.update(this.clockCajaGirando.getDelta());
         
         this.mostrar_cajagirando();
-        var tiempogirando = performance.now() - this.iniciogiro;
+        var tiempogirando = performance.now() - this.camara_iniciogiro;
         this.renderer.render(this.scene, this.camera);
         if(tiempogirando/1000 <= (this.TIEMPO_GIRO_CAJA/1000) ){
         }
@@ -797,22 +807,22 @@ class Cuy {
             this.maderas = [];
             this.maderas.push(this.getObjeto_caja("madera"));
             this.maderas.push(this.getObjeto_caja("madera2"));
-            this.posicionycajaxinicial = -9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
-            this.posicionfinalcaja = -11.4;//8.2;//3.4999993133545217//800;
+            // this.posicionycajaxinicial = -9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
+            // this.posicionfinalcaja = -11.4;//8.2;//3.4999993133545217//800;
             
-            //cajax_posicioninicial=cajax.getWorldPosition();
-            this.cajax_posicioninicial= new THREE.Vector3() ; 
-            this.cajax.getWorldPosition(this.cajax_posicioninicial);
+            // //cajax_posicioninicial=cajax.getWorldPosition();
+            // this.cajax_posicioninicial= new THREE.Vector3() ; 
+            // this.cajax.getWorldPosition(this.cajax_posicioninicial);
     
             this.posicionmadera = new THREE.Vector3() ; 
             this.getObjeto_caja("madera").getWorldPosition(this.posicionmadera);
     
-            this.dtcajax = 0.2;
-            this.tcajax = 0;
-            this.rotacionx_inicio = 0;//-7.318557638911297e-33;
-            this.rotacionx_fin =-Math.PI / 2;//-1.4;
-            this.q1_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
-            this.q2_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
+            // this.dtcajax = 0.2;
+            // this.tcajax = 0;
+            // this.rotacionx_inicio = 0;//-7.318557638911297e-33;
+            // this.rotacionx_fin = -Math.PI / 2;//-1.4;
+            // this.q1_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
+            // this.q2_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
             this.timerotacion = 0;
     
             if(typeof this.controls!="undefined"){
@@ -917,7 +927,8 @@ class Cuy {
                 this.CUY_CORRIENDO = true;
                 this.mover_cuyrandom();
             }
-        } else 
+        } 
+        else 
         {
             cancelAnimationFrame(this.var_cuymoviendo);
         } 
@@ -931,7 +942,7 @@ class Cuy {
         var newX = this.lerp(this.a.x, this.b.x, funcion_ease(this.t));  
         var newY = this.lerp(this.a.y, this.b.y, funcion_ease(this.t));  
         var newZ = this.lerp(this.a.z, this.b.z, funcion_ease(this.t));  
-        this.model.position.set(newX,0,newZ); 
+        this.model.position.set( newX , 0 , newZ );
         //t += dt;
         this.t = parseFloat( this.t + this.dt).toFixed(5);
         this.t = parseFloat(this.t);
@@ -942,13 +953,15 @@ class Cuy {
         if(this.t >= 1)
         {
             // console.warn("LLEGÓ ccc");
-            this.model.position.set(this.b.x,
-                 this.b.y,
-                 this.b.z)
+            this.model.position.set(
+                this.b.x,
+                this.b.y,
+                this.b.z)
             ; ///ajustar posición si no llegó exacto
-            this.a = { x: this.model.position.x,
-                 y: this.model.position.y,
-                 z: this.model.position.z 
+            this.a = { 
+                x: this.model.position.x,
+                y: this.model.position.y,
+                z: this.model.position.z 
             };   //////nueva posicion
             cancelAnimationFrame(this.var_cuymoviendo);
             this.detener_animacion();///ant
@@ -976,6 +989,7 @@ class Cuy {
                         this.posicion_fin_caja = new THREE.Vector3();
                         this.getObjeto_caja(this.GANADOR_DE_EVENTO).getWorldPosition(this.posicion_fin_caja);
                         this.posicion_fin_caja.y = 0;
+
                         this.CUY_CORRIENDO = false;
                         var puntosspline = [];
                         this.posicionmodel = new THREE.Vector3();
@@ -984,12 +998,12 @@ class Cuy {
                         this.puntootro.y = 0;
                         puntosspline.push(this.posicionmodel);
                         puntosspline.push(this.puntootro);
-                        puntosspline.push(this.posicion_fin_caja);
+                        puntosspline.push(this.posicion_fin_caja);//ganador evento
                         // spline= new THREE.SplineCurve3(puntosspline);
-                        var spline =  new THREE.CatmullRomCurve3(puntosspline);
+                        this.spline =  new THREE.CatmullRomCurve3(puntosspline);
                         this.t = 0;
                         this.dtSPLINE = 0.025;
-                        var dist_spline = spline.getLength();
+                        var dist_spline = this.spline.getLength();
                         // console.info("dist_spline "+dist_spline);
                         if(dist_spline > 4){
                             this.dtSPLINE = 0.009;
@@ -1014,6 +1028,8 @@ class Cuy {
                    // delete funcion_callback;
                 }
                 console.info("fin");
+                this.t = 1 ;
+                this.t_portada  = 1 ;
             }///ms > tiempo
             else
             {
@@ -1109,11 +1125,11 @@ class Cuy {
         }
         var vector_ganador = new THREE.Vector3();
         this.getObjeto_caja(ganador).getWorldPosition(vector_ganador);
-        this.otro.position.copy(vector_ganador);
-        this.otro.lookAt(0,0,0);
-        this.otro.translateZ(1);
+        otro.position.copy(vector_ganador);
+        otro.lookAt(0,0,0);
+        otro.translateZ(1);
         var posicionnueva = new THREE.Vector3();
-        this.otro.getWorldPosition(posicionnueva);
+        otro.getWorldPosition(posicionnueva);
         var vector = new THREE.Vector3(posicionnueva.x,0,posicionnueva.z);
         return vector;
     }
@@ -1247,7 +1263,7 @@ class Cuy {
         this.clock = new THREE.Clock();
         this.clockCuyDudando = new THREE.Clock();
         this.clockCuyChoque = new THREE.Clock();
-        this.clockCajaP = new THREE.Clock();
+        this.clockCajaGirando = new THREE.Clock();
         this.t = 0;
         $("#barra_loading_tpi").css("height","100%");
         // $("#barra_loading_tpi").css("width","0%");
@@ -1255,7 +1271,8 @@ class Cuy {
         //INDICE_PUNTOS_CUY=0;
     }
     mostrar_cajagirando(){
-        this.modelCajaP.visible = true;
+        this.modelCajaGirando.visible = true;
+
         this.model.visible = false; 
         this.modelCuyDudando.visible = false;       
         this.modelCuyChoque.visible = false;
@@ -1267,8 +1284,8 @@ class Cuy {
     puntos_azar_inicio(inicio){
         var arrayvector = [];
         arrayvector.push(new THREE.Vector3(inicio.x,0,inicio.z));
-        for(var a=0; a < 10; a++ ){
-            var nuevo = this.generar_nueva_posicion_random2(2.35);
+        for(var a = 0 ; a < 10 ; a++ ){
+            let nuevo = this.generar_nueva_posicion_random2(2.35);
             arrayvector.push(new THREE.Vector3(nuevo.x,0,nuevo.z))
         }
         return arrayvector;
@@ -1277,9 +1294,11 @@ class Cuy {
         if(!this.CUY_ROTANDO){return;}
         this.model.visible = true;
         this.modelCuyDudando.visible = false;
-        this.modelCuyChoque.visible = false; 
+        this.modelCuyChoque.visible = false;
+
         this.timerotacion = parseFloat(this.timerotacion + this.dtrotacion).toFixed(5);
         this.timerotacion = parseFloat(this.timerotacion);
+
         this.var_cuy_rotando = requestAnimationFrame(this.cuy_rotacionrandom.bind(this));
         this.mixer.update(this.clock.getDelta());
         THREE.Quaternion.slerp(this.q1, this.q2, this.model.quaternion, this.timerotacion); // added
@@ -1300,12 +1319,15 @@ class Cuy {
             this.modelCuyDudando.rotation.x = this.model.rotation.x;
             this.modelCuyDudando.rotation.y = this.model.rotation.y;
             this.modelCuyDudando.rotation.z = this.model.rotation.z;
+
             this.modelCuyChoque.rotation.x = this.model.rotation.x;
             this.modelCuyChoque.rotation.y = this.model.rotation.y;
             this.modelCuyChoque.rotation.z = this.model.rotation.z;
+
             this.modelCuyDudando.position.x = this.model.position.x;
             this.modelCuyDudando.position.y = this.model.position.y;
             this.modelCuyDudando.position.z = this.model.position.z;
+
             this.a = { 
                 x: this.model.position.x,
                 y: this.model.position.y,
@@ -1347,9 +1369,10 @@ class Cuy {
            this.aumento = 0;
         }
     }
-    detener_var_correr_spline_portada(){
+    detener_var_correr_spline_portada(){/*stop cuy en portada */
         if(typeof this.var_correr_spline_portada != "undefined"){
              cancelAnimationFrame(this.var_correr_spline_portada);
+             this.t = 0;
              delete this.var_correr_spline_portada;
         }
     }
@@ -1430,7 +1453,7 @@ class Cuy {
             }
         });
     }
-    ocultar_cuy_cargando(){
+    ocultar_cuy_cargando(){//hide DIV img CUY CARGANDO
         $("#DIV_CARGANDO").hide();
     }
     detener_timeout_conexionwebsockets(){

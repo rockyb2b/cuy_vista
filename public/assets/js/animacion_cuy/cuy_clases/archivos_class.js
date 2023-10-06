@@ -58,22 +58,22 @@ class Archivos {
                 this.cuy.mixer.clipAction(animations[0]).play();
             }
             if (this.archivos[this.index] == "images/glb/cajagirando1.glb") {
-                this.cuy.modelCajaP = gltf.scenes[0];
-                this.cuy.modelCajaP.traverse(function (objectCajaGira) {
+                this.cuy.modelCajaGirando = gltf.scenes[0];
+                this.cuy.modelCajaGirando.traverse(function (objectCajaGira) {
                     if (objectCajaGira instanceof THREE.Mesh) {
                         //objectCajaGira.castShadow = true
                     }
                 });
-                this.cuy.modelCajaP.name = "CAJA_GIRANDO";
-                this.cuy.modelCajaP.scale.set(this.escalacajagirando,this.escalacajagirando,this.escalacajagirando);
-                this.cuy.modelCajaP.position.set(0, 0, 0);
-                this.cuy.modelCajaP.position.y=-0.006;
+                this.cuy.modelCajaGirando.name = "CAJA_GIRANDO";
+                this.cuy.modelCajaGirando.scale.set(this.escalacajagirando,this.escalacajagirando,this.escalacajagirando);
+                this.cuy.modelCajaGirando.position.set(0, 0, 0);
+                this.cuy.modelCajaGirando.position.y=-0.006;
 
-                this.cuy.scene.add(this.cuy.modelCajaP);
+                this.cuy.scene.add(this.cuy.modelCajaGirando);
                 var animations = gltf.animations;
             
-                this.cuy.mixerCajaP = new THREE.AnimationMixer(this.cuy.modelCajaP);
-                this.cuy.mixerCajaP.clipAction(animations[0]).play();
+                this.cuy.mixerCajaGirando = new THREE.AnimationMixer(this.cuy.modelCajaGirando);
+                this.cuy.mixerCajaGirando.clipAction(animations[0]).play();
             }
             if (this.archivos[this.index] == "images/glb/cuycabezagirando.glb") {
                 this.cuy.modelCuyDudando = gltf.scenes[0];
