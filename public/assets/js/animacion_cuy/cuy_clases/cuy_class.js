@@ -1,4 +1,5 @@
 import { Archivos } from './archivos_class.js';
+import { CuyMovement } from './cuymovement_class.js';
 
 const IPSERVIDOR_WEBSOCKETS = "1";//$("#IPSERVIDOR_WEBSOCKETS").val();
 const PUERTO_WEBSOCKETS=$("#PUERTO_WEBSOCKETS").val();
@@ -71,8 +72,8 @@ class Cuy {
         this.escalacajagirando = 1;
         this.intervalo_consultaevento = 2000;
         this.buscando_evento = false;
-        this.ANIMACION_CUY = false;
-        this.ANIMACION_CUY_PORTADA = false;
+        this.ANIMACION_CUY_PORTADA = false;//cuy movement waiting for start event
+        this.ANIMACION_CUY = false;//cuy movement for  event 
         this.TEXTO_NEON_PORTADA = "¿A donde va el cuy? ¡Realiza Tu Apuesta!";
         this.TEXTO_CONTADOR = "APUESTAS SE CIERRAN EN";
         this.TEXTO_ESPERAR_TERMINO_EVENTO = "EVENTO TERMINA EN";
@@ -95,7 +96,7 @@ class Cuy {
         this.t;
         this.t_portada;
         this.timerotacion;
-
+        this.t_spline_ganador;
         // this.cajax_posicioninicial;
         this.posicionmadera;
 
@@ -137,6 +138,7 @@ class Cuy {
 
         this.posicionmodel;
         this.radians;
+        this.tangent;
         ///activar CUY
         this.TIEMPO_GIRO_CAJA = 3000;
         this.TIEMPO_ESPERA_CASAGANADOR = 1000; ///tiempo espera luego q cuy entra en casa
@@ -144,8 +146,9 @@ class Cuy {
 
     }
     accion_cuy2(evento_valor_ganador = 15,seg_barra_loading = 2 ,seg_para_finevento = 10) {
+        this.t = 0;
         this.EVENTO_ID = 1
-        this.GANADOR_DE_EVENTO ="5"
+        this.GANADOR_DE_EVENTO =evento_valor_ganador
         $("#evento_actual_portada").text("#" + this.EVENTO_ID);
     
         this.TIEMPO_CUY = (20 * 1000) - this.TIEMPO_GIRO_CAJA; //EVENTO_ACTUAL.tiempo_cuy_moviendo;
@@ -197,6 +200,70 @@ class Cuy {
                     height: "0%"
                 }, (seg_para_finevento) * 1000, function() {
                     this.callback_esperar_termino_evento(ganador_evento);
+                });
+                this.actualizar_contador_texto(seg_para_finevento , this.TEXTO_ESPERAR_TERMINO_EVENTO);
+            } 
+            else 
+            {
+                this.toastr_eventofinalizo = toastr.info(" Evento actual ya finalizó")
+                if (typeof timeout_eventofinalizo != "undefined") {
+                    //clearTimeout(timeout_eventofinalizo);
+                } else {
+                    timeout_eventofinalizo = setTimeout(() => {
+                        this.toastr_eventofinalizo.hide();
+                        clearTimeout(timeout_eventofinalizo);
+                    //   delete timeout_eventofinalizo;
+                        iniciar_websocketservidor();
+                    }, 4000)
+                }
+            } ///else segundos_para_fin_evento >0
+      } //fin else
+    } ///fin accion cuy2
+
+    jugar_cuy(evento_valor_ganador = 15,seg_barra_loading = 2 ,seg_para_finevento = 10) {
+        this.EVENTO_ID = 1
+        this.GANADOR_DE_EVENTO = evento_valor_ganador
+        $("#evento_actual_portada").text("#" + this.EVENTO_ID);
+    
+        this.TIEMPO_CUY = (20 * 1000) - this.TIEMPO_GIRO_CAJA; //EVENTO_ACTUAL.tiempo_cuy_moviendo;
+        this.TIEMPO_CUY_CHOQUE = 5000;///tiempo espera cuy en estado de choque
+       
+        this.PUNTOS_CUY = this.generarPosicionesRandom();
+    
+        var id_evento = 1;
+        var fecha_fin = '2023-09-26 11:50';
+        var fecha_fin_ev = moment(fecha_fin, "YYYY-MM-DD HH:mm:ss a");
+        // if (ANIMACION_CUY_PORTADA == false) {
+        //     INICIO_ANIMACION_CUY_PORTADA(); /*CUY PORTADA*/ ;
+        // }
+        if (seg_barra_loading > 0) { ///EN rango animacion
+            setTimeout(() => {
+                const self = this;
+                ///barra carga cuy
+                this.mostrar_div_eventoesperando();
+                $("#barra_loading_tpi").animate({
+                    height: "0%"
+                }, (seg_barra_loading) * 1000, function() {
+                    setTimeout(()=>{
+                        if(typeof $("#termotetro_para_iniciar").data("illuminate") != "undefined"){
+                            $("#termotetro_para_iniciar").data("illuminate").destruir();
+                        }
+                        self.callback_animacion(id_evento);
+                    },1000)
+                    ;
+                });
+                this.actualizar_contador_texto_latido(seg_barra_loading,this.TEXTO_CONTADOR);
+            }, 1000);
+        } else { //////seg animacionm else
+            toastr.options = opciones_toast_mantener;
+            console.log(performance.now() + " esperando fecha fin evento actual " + id_evento + ",para recargar " + fecha_fin_ev);
+            if (seg_para_finevento > 0) {
+                this.mostrar_div_eventoesperando();
+                this.toast_eventoterminar = toastr.info("Esperando que termine evento actual");
+                $("#barra_loading_tpi").animate({
+                    height: "0%"
+                }, (seg_para_finevento) * 1000, function() {
+                    this.callback_esperar_termino_evento(this.GANADOR_DE_EVENTO);
                 });
                 this.actualizar_contador_texto(seg_para_finevento , this.TEXTO_ESPERAR_TERMINO_EVENTO);
             } 
@@ -276,7 +343,7 @@ class Cuy {
         this.ANIMACION_CUY = true;
         // iniciogiro =  clockCajaP.getElapsedTime();
         this.t = 0   /// tiempo movimiento cuy;
-        this.t_portada = 0;
+        this.t_portada = 1;
         this.timerotacion = 0; 
         this.ocultar_cuy_esperando();
         this.detener_var_animarcamara();
@@ -563,19 +630,10 @@ class Cuy {
         this.maderas = [];
         this.maderas.push(this.getObjeto_caja("madera"));
         this.maderas.push(this.getObjeto_caja("madera2"));
-        // this.posicionycajaxinicial = -9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
-        // this.posicionfinalcaja = -11.4;//8.2;//3.4999993133545217//800;
-        // this.cajax_posicioninicial = new THREE.Vector3() ; 
-        // this.cajax.getWorldPosition(this.cajax_posicioninicial);
+                
         this.posicionmadera = new THREE.Vector3() ; 
         this.getObjeto_caja("madera").getWorldPosition(this.posicionmadera);
-
-        // this.dtcajax = 0.2;
-        // this.tcajax = 0;
-        // this.rotacionx_inicio = 0;//-7.318557638911297e-33;
-        // this.rotacionx_fin = -Math.PI / 2;//-1.4;
-        // this.q1_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
-        // this.q2_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
+        
         this.timerotacion = 0;
         if(typeof this.controls != "undefined"){
             this.controls.autoRotate = false;
@@ -590,7 +648,32 @@ class Cuy {
         this.spline = new THREE.CatmullRomCurve3(this.puntos_azar_inicio(this.inicio));
         this.dtSPLINE = 0.0015;
         // this.correr_spline_portada(this.inicio);
-        this.correr_spline_portada();
+        // this.correr_spline_portada();
+
+        // var inicio = 
+        // {
+        //     x : this.cuy.model.position.x,
+        //     y : this.cuy.model.position.y,
+        //     z : this.cuy.model.position.z
+        // };
+        // this.spline = new THREE.CatmullRomCurve3(this.puntos_azar_inicio(inicio));
+
+        var callback = function()
+        {
+            this.detener_animacion_correr_cuy();
+            var posicion_actual = 
+                {
+                    x : this.cuy.model.position.x,
+                    y : this.cuy.model.position.y,
+                    z : this.cuy.model.position.z
+                };
+            this.spline = new THREE.CatmullRomCurve3(this.puntos_azar(posicion_actual));
+            this.correr_cuy();
+        }
+
+        var cuymov = new CuyMovement({cuy : this , t : 0  , callback : callback});
+        cuymov.correr_cuy();
+
         // camara_movimiento_inicio({x:0,y:10.3,z:0},camera,2500);
         // iniciar_cuy(GANADOR_DE_EVENTO,TIEMPO_CUY);
     }
@@ -664,18 +747,17 @@ class Cuy {
             this.t_portada = 1;
             this.detener_var_correr_spline_portada();
         }
-        this.model.visible = true;
+        // this.model.visible = true;
         this.modelCuyChoque.visible = false;
         this.var_correr_spline_portada = requestAnimationFrame(this.correr_spline_portada.bind(this));// Keep the context of 'this'
         
-        var tangent;
         var pt = this.spline.getPoint( this.t_portada );
         this.model.position.set( pt.x, pt.y, pt.z );
-        tangent = this.spline.getTangent( this.t_portada ).normalize();
+        var tangent = this.spline.getTangent( this.t_portada ).normalize();
         this.mixer.update(this.clock.getDelta())
         this.axis.crossVectors(this.up, tangent).normalize();
-        var radians = Math.acos( this.up.dot( tangent ) );
-        this.model.quaternion.setFromAxisAngle( this.axis, radians );
+        this.radians = Math.acos( this.up.dot( tangent ) );
+        this.model.quaternion.setFromAxisAngle( this.axis, this.radians );
         this.t_portada = this.t_portada + this.dtSPLINE;
         if(this.t_portada >= 1){
             // model.position.copy(posicion_fin_caja);
@@ -806,23 +888,11 @@ class Cuy {
             this.cajax = this.getObjeto_caja("x");
             this.maderas = [];
             this.maderas.push(this.getObjeto_caja("madera"));
-            this.maderas.push(this.getObjeto_caja("madera2"));
-            // this.posicionycajaxinicial = -9.8808069229126  ;//9.932283401;//-6.86645478253922e-7;//-993.228455;///  z=>  -993.228455
-            // this.posicionfinalcaja = -11.4;//8.2;//3.4999993133545217//800;
-            
-            // //cajax_posicioninicial=cajax.getWorldPosition();
-            // this.cajax_posicioninicial= new THREE.Vector3() ; 
-            // this.cajax.getWorldPosition(this.cajax_posicioninicial);
+            this.maderas.push(this.getObjeto_caja("madera2"));            
     
             this.posicionmadera = new THREE.Vector3() ; 
             this.getObjeto_caja("madera").getWorldPosition(this.posicionmadera);
-    
-            // this.dtcajax = 0.2;
-            // this.tcajax = 0;
-            // this.rotacionx_inicio = 0;//-7.318557638911297e-33;
-            // this.rotacionx_fin = -Math.PI / 2;//-1.4;
-            // this.q1_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
-            // this.q2_cajax = new THREE.Quaternion().copy(this.cajax.quaternion);
+                
             this.timerotacion = 0;
     
             if(typeof this.controls!="undefined"){
@@ -1001,14 +1071,17 @@ class Cuy {
                         puntosspline.push(this.posicion_fin_caja);//ganador evento
                         // spline= new THREE.SplineCurve3(puntosspline);
                         this.spline =  new THREE.CatmullRomCurve3(puntosspline);
-                        this.t = 0;
+                        this.t_spline_ganador = 0;
                         this.dtSPLINE = 0.025;
                         var dist_spline = this.spline.getLength();
                         // console.info("dist_spline "+dist_spline);
                         if(dist_spline > 4){
                             this.dtSPLINE = 0.009;
                         }
+                        console.log("INICIO SPLINE");
                         this.correr_spline();
+                        console.log("FIN  SPLINE");
+
                     }
                 }
                 else 
@@ -1054,19 +1127,19 @@ class Cuy {
     }
     correr_spline(){
         this.var_correr = requestAnimationFrame(this.correr_spline.bind(this));
-        var tangent;
-        this.pt = this.spline.getPoint( this.t );
+        this.pt = this.spline.getPoint( this.t_spline_ganador );
         //    console.log(pt)
         this.model.position.set( this.pt.x, this.pt.y, this.pt.z );
-        var tangent = this.spline.getTangent( this.t ).normalize();
+        this.tangent = this.spline.getTangent( this.t_spline_ganador ).normalize();
         this.mixer.update(this.clock.getDelta())
-        this.axis.crossVectors(this.up, tangent).normalize();
-        this.radians = Math.acos( this.up.dot( tangent ) );
+        this.axis.crossVectors(this.up, this.tangent).normalize();
+        this.radians = Math.acos( this.up.dot( this.tangent ) );
         this.model.quaternion.setFromAxisAngle( this.axis, this.radians );
-        this.t = this.t + this.dtSPLINE;
-        if(this.t >= 1){
+        this.t_spline_ganador = this.t_spline_ganador + this.dtSPLINE;
+        console.log(this.t_spline_ganador);
+        if(this.t_spline_ganador >= 1){
             this.model.position.copy(this.posicion_fin_caja);
-            this.t = 0;
+            this.t_spline_ganador = 0;
             cancelAnimationFrame(this.var_correr);
                 // console.info("FIN SPLINE");
             this.CUY_CORRIENDO = false;
