@@ -1095,7 +1095,7 @@ function mover_cuyrandom() {    ///var_cuymoviendo  => animationframe
       
         if (milisegundos > TIEMPO_RANDOM) {////tiempo de animacion cuy paso, ir a caja ganador posicion
             if(!mover_a_ganador){
-                    mover_a_ganador=true;
+                    mover_a_ganador = true;
                     // b = get_caja(GANADOR_DE_EVENTO).posicion;
                     if(GANADOR_DE_EVENTO == "x" || GANADOR_DE_EVENTO == "0"){
                         bfuncion_easing_indice = 7;//easeInQuart

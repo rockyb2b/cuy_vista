@@ -33,6 +33,7 @@ class Cuy {
         this.modelCuySalto;
         this.modelCuyEsperando;
 
+        this.animation;
         this.skeleton;
 
         this.mixer;
@@ -122,7 +123,6 @@ class Cuy {
         this.camara_iniciogiro;
 
         this.mover_a_ganador;
-        
 
         this.animacion;
         this.aumento;
@@ -155,15 +155,6 @@ class Cuy {
         this.TIEMPO_CUY_CHOQUE = 5000;///tiempo espera cuy en estado de choque
        
         this.PUNTOS_CUY = this.generarPosicionesRandom();
-    
-        this.FECHA_INICIO_EVENTO = "2023-09-26";
-        this.FECHA_INICIO_EVENTO = moment(this.FECHA_INICIO_EVENTO, "YYYY-MM-DD HH:mm:ss a");
-    
-        this.FECHA_FIN_EVENTO = "2023-09-26";
-        this.FECHA_FIN_EVENTO = moment(this.FECHA_FIN_EVENTO, "YYYY-MM-DD HH:mm:ss a");
-    
-        this.FECHA_ANIMACION = "2023-09-26";
-        this.FECHA_ANIMACION = moment(this.FECHA_ANIMACION, "YYYY-MM-DD HH:mm:ss a");
     
         var id_evento = 1;
         var ganador_evento = evento_valor_ganador;
@@ -660,20 +651,35 @@ class Cuy {
 
         var callback = function()
         {
-            this.detener_animacion_correr_cuy();
-            var posicion_actual = 
-                {
-                    x : this.cuy.model.position.x,
-                    y : this.cuy.model.position.y,
-                    z : this.cuy.model.position.z
-                };
-            this.spline = new THREE.CatmullRomCurve3(this.puntos_azar(posicion_actual));
-            this.correr_cuy();
+            // var cuymovement_class = this;
+            // cuymovement_class.detener_animacion_correr_cuy();
+            // // cuymovement_class.cuydudando();
+            // // setTimeout(function(){
+            //     // cuymovement_class.detener_animacion_cuydudando();
+            // cuymovement_class.t = 0;
+            // var posicion_actual = 
+            //     {
+            //         x : cuymovement_class.cuy.model.position.x,
+            //         y : cuymovement_class.cuy.model.position.y,
+            //         z : cuymovement_class.cuy.model.position.z
+            //     };
+            // console.log(posicion_actual);
+            // cuymovement_class.callback = function(){
+                
+            // };
+            // cuymovement_class.spline = new THREE.CatmullRomCurve3(cuymovement_class.puntos_azar(posicion_actual));
+            // cuymovement_class.animacion_correr_cuy = null;
+            // cuymovement_class.correr_cuyNEW();
+            // },2000)
         }
-
-        var cuymov = new CuyMovement({cuy : this , t : 0  , callback : callback});
-        cuymov.correr_cuy();
-
+        const fps = 30;
+        var fpsInterval = 1000 / fps;
+        var cuymov = new CuyMovement({cuy : this ,fpsInterval : fpsInterval,  t : 0  , callback : callback});
+        this.animation = cuymov; 
+        // cuymov.correr_cuy();
+        cuymov.correr_cuy_indefinido();
+        // cuymov.correr_cuyganador();
+        
         // camara_movimiento_inicio({x:0,y:10.3,z:0},camera,2500);
         // iniciar_cuy(GANADOR_DE_EVENTO,TIEMPO_CUY);
     }
@@ -1161,12 +1167,12 @@ class Cuy {
         }
     }
     cuydudando() {
-        this.mixerCuyDudando.update(this.clockCuyDudando.getDelta());
+        this.cuy.mixerCuyDudando.update(this.cuy.clockCuyDudando.getDelta());
         this.var_cuydudando = requestAnimationFrame(this.cuydudando.bind(this));
-        this.modelCuyDudando.visible = true;
-        this.model.visible = false;
-        this.modelCuyChoque.visible = false;
-        this.renderer.render(this.scene, this.camera);
+        this.cuy.modelCuyDudando.visible = true;
+        this.cuy.model.visible = false;
+        this.cuy.modelCuyChoque.visible = false;
+        this.cuy.renderer.render(this.cuy.scene, this.cuy.camera);
     }
     get_caja(numero){
         var cajaobjeto = {};
